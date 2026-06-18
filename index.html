@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم مركز العلاج الطبيعي</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; color: #333; }
+        .navbar { background: #0f5132; padding: 10px 20px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 15px; }
+        .navbar a { color: white; text-decoration: none; font-weight: bold; padding: 8px 16px; border-radius: 5px; }
+        .navbar a:hover { background: #157347; }
+        .header { background: #0f5132; color: white; padding: 15px; text-align: center; border-radius: 8px; margin-bottom: 20px; }
+        .cards-container { display: flex; gap: 20px; justify-content: space-between; margin-bottom: 30px; flex-wrap: wrap; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); flex: 1; min-width: 200px; text-align: center; border-top: 5px solid #0f5132; }
+        .card.profit { border-top-color: #198754; }
+        .card.loss { border-top-color: #dc3545; }
+        .card h3 { margin: 0 0 10px 0; color: #666; font-size: 16px; }
+        .card .number { font-size: 24px; font-weight: bold; color: #111; }
+        .chart-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); height: 400px; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="#" style="background: #157347;">📊 لوحة التحكم (الداش بورد)</a>
+        <a href="patients.html">👥 الحجوزات والمرضى</a>
+    </div>
+
+    <div class="header">
+        <h2>لوحة المتابعة الفورية - مركز العلاج الطبيعي</h2>
+        <p>متابعة الأداء المالي لايف من واقع الحجوزات الفورية</p>
+    </div>
+
+    <div class="cards-container">
+        <div class="card profit">
+            <h3>إيرادات اليوم الحقيقية</h3>
+            <div class="number" id="todayRevenue">0 جنيه</div>
+        </div>
+        <div class="card">
+            <h3>إجمالي حالات اليوم</h3>
+            <div class="number" id="todayCases">0 حالة</div>
+        </div>
+        <div class="card loss">
+            <h3>مصروفات تقديرية</h3>
+            <div class="number">450 جنيه</div>
+        </div>
+        <div class="card profit">
+            <h3>صافي الربح اللحظي</h3>
+            <div class="number" id="netProfit" style="color: #198754;">0 جنيه</div>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <canvas id="salesChart"></canvas>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', calculateDashboardData);
+
+        function calculateDashboardData() {
+            // جلب البيانات من الذاكرة المشتركة
+            let appointments = JSON.parse(localStorage.getItem('clinic_appointments')) || [];
+            
+            let todayRevenue = 0;
+            let todayCases = appointments.length;
+
+            // حساب الإيرادات من الحالات التي "تمت الجلسة والدفع" فقط
+            appointments.forEach(app => {
+                if(app.status === 'done') {
+                    todayRevenue += app.price;
+                }
+            });
+
+            let fixedExpenses = 450; // مصروفات افتراضية لليوم
+            let netProfit = todayRevenue - fixedExpenses;
+
+            // تحديث شاشة العرض بالبيانات الحقيقية
+            document.getElementById('todayRevenue').innerText = todayRevenue.toLocaleString() + ' جنيه';
+            document.getElementById('todayCases').innerText = todayCases + ' حالة';
+            document.getElementById('netProfit').innerText = (netProfit > 0 ? '+ ' : '') + netProfit.toLocaleString() + ' جنيه';
+
+            // تحديث الرسم البياني (حطينا إيراد النهاردة كآخر نقطة في الأسبوع كمثال)
+            updateChart(todayRevenue);
+        }
+
+        function updateChart(todayRev) {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة (اليوم)'],
+                    datasets: [{
+                        label: 'حركة الإيرادات اليومية (بالجنيه)',
+                        data: [2100, 3200, 1800, 4100, 2900, 3500, todayRev], // رقم اليوم متغير لايف
+                        borderColor: '#0f5132',
+                        backgroundColor: 'rgba(15, 81, 50, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
