@@ -3,332 +3,285 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام مَدَى لإدارة العلاج الطبيعي</title>
+    <title>نظام مَدَى لإدارة العلاج الطبيعي - MADA Physio Clinic</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
-            --primary-green: #115e3b; /* الأخضر الداكن لمركز مدى */
-            --accent-green: #1b8a57;
-            --light-bg: #f4f7f6;
-            --dark-text: #2c3e50;
-            --card-border: #e2e8f0;
+        :root { 
+            --card-bg: rgba(22, 22, 30, 0.9); 
+            --mada-green: #0a4d34; 
+            --mada-blue: #4dd0e1; 
+            --text-main: #ffffff;
+            --text-muted: #a0a0b0;
+            --success-color: #00c853; 
+            --expense-color: #ff1744; 
+        }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            color: var(--text-main);
+            min-height: 100vh;
+            position: relative;
+            background-image: url('علاج طبيعي.png'); 
+            background-repeat: repeat; 
+            background-position: center;
+            background-attachment: fixed; 
+            background-color: #0b1511; 
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--light-bg);
-            margin: 0;
-            padding: 20px;
-            color: var(--dark-text);
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(14, 14, 18, 0.55); 
+            z-index: -1;
         }
-
-        /* الهيدر الأخضر المميز مع اللوجو */
-        .main-header {
-            background-color: var(--primary-green);
-            padding: 15px 30px;
-            border-radius: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
+        
+        /* 🏛️ الهيدر الجديد باللون الأبيض */
+        .main-header { 
+            background-color: #ffffff; /* اللون الأبيض الذي طلبته */
+            padding: 15px 30px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-bottom: 3px solid var(--mada-blue);
         }
+        
+        /* تعديل النصوص لتظهر بوضوح على الخلفية البيضاء */
+        .header-info h2 { margin: 0; font-size: 20px; color: #000000; letter-spacing: 0.5px; }
+        .header-info p { margin: 5px 0 0 0; font-size: 13px; color: #555555; }
 
-        .header-title {
-            color: white;
-            margin: 0;
-            font-size: 18px;
-            font-weight: 500;
-        }
-
-        .logo-box {
-            background-color: white;
-            padding: 5px 15px;
-            border-radius: 6px;
+        .logo-container {
             display: flex;
             align-items: center;
             justify-content: center;
         }
-
-        .logo-box img {
-            height: 45px;
+        .logo-container img {
+            height: 55px;
             width: auto;
             object-fit: contain;
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.1));
         }
 
-        /* شريط التاب */
-        .navbar {
-            display: flex;
-            gap: 10px;
-            background: white;
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-
-        .tab-btn {
-            background: none;
-            border: none;
-            padding: 12px 24px;
-            font-size: 15px;
-            font-weight: bold;
-            color: var(--primary-green);
-            cursor: pointer;
-            border-radius: 6px;
-            transition: 0.2s;
-        }
-
-        .tab-btn:hover {
-            background-color: #e8f5e9;
-        }
-
-        .tab-btn.active {
-            background-color: var(--primary-green);
-            color: white;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* الكروت الإحصائية */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .metric-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-            border: 1px solid var(--card-border);
-            text-align: center;
-        }
-
-        .metric-card h3 {
-            margin: 0 0 10px 0;
-            font-size: 14px;
-            color: #7f8c8d;
-        }
-
-        .metric-card .value {
-            font-size: 26px;
-            font-weight: bold;
-            color: var(--primary-green);
-        }
-
-        .chart-box {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-            border: 1px solid var(--card-border);
-            height: 350px;
-        }
-
-        /* التنسيق العام للجداول والنماذج */
-        .split-layout {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .panel {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-            border: 1px solid var(--card-border);
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .panel-large {
-            flex: 2;
-            min-width: 450px;
-        }
-
-        .panel h3 {
-            margin-top: 0;
-            color: var(--primary-green);
-            border-bottom: 2px solid #e8f5e9;
-            padding-bottom: 10px;
-            font-size: 16px;
-        }
-
-        .form-control {
-            margin-bottom: 15px;
-        }
-
-        .form-control label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 6px;
-            font-size: 13px;
-        }
-
-        .form-control input, .form-control select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
-
-        .btn-submit {
-            background-color: var(--primary-green);
-            color: white;
-            border: none;
-            padding: 12px;
-            width: 100%;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .btn-submit:hover {
-            background-color: var(--accent-green);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: right;
-            border-bottom: 1px solid #edf2f7;
-            font-size: 14px;
-        }
-
-        th {
-            background-color: #f8fafc;
-            color: var(--primary-green);
-        }
+        /* ... بقية الكود يظل كما هو دون تغيير ... */
+        .navbar { background: var(--card-bg); padding: 8px; border-radius: 12px; margin-bottom: 25px; display: flex; gap: 10px; border: 1px solid rgba(34, 34, 47, 0.7); backdrop-filter: blur(5px); }
+        .tab-btn { background: none; border: none; color: var(--text-muted); font-weight: bold; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 15px; transition: 0.3s; }
+        .tab-btn:hover { background: rgba(30, 30, 42, 0.8); color: #ffffff; }
+        .tab-btn.active { background: var(--mada-green); color: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .cards-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .card { background: var(--card-bg); padding: 22px; border-radius: 12px; text-align: center; border: 1px solid rgba(34, 34, 47, 0.7); transition: 0.3s; backdrop-filter: blur(5px); }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.5); }
+        .card.profit { border-top: 4px solid var(--success-color); }
+        .card.loss { border-top: 4px solid var(--expense-color); }
+        .card.neutral { border-top: 4px solid var(--mada-blue); }
+        .card h3 { margin: 0 0 12px 0; color: var(--text-muted); font-size: 14px; }
+        .card .number { font-size: 28px; font-weight: bold; color: #ffffff; }
+        .chart-container { background: var(--card-bg); padding: 25px; border-radius: 12px; height: 380px; border: 1px solid rgba(34, 34, 47, 0.7); backdrop-filter: blur(5px); }
+        .dashboard-layout { display: flex; gap: 20px; flex-wrap: wrap; }
+        .form-section { background: var(--card-bg); padding: 25px; border-radius: 12px; flex: 1; min-width: 300px; border: 1px solid rgba(34, 34, 47, 0.7); backdrop-filter: blur(5px); }
+        .table-section { background: var(--card-bg); padding: 25px; border-radius: 12px; flex: 2; min-width: 450px; border: 1px solid rgba(34, 34, 47, 0.7); backdrop-filter: blur(5px); }
+        h3 { margin-top: 0; color: #ffffff; border-bottom: 2px solid rgba(34, 34, 47, 0.7); padding-bottom: 10px; font-size: 16px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--text-muted); }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #2c2c3c; border-radius: 8px; box-sizing: border-box; background: #1c1c24; color: #ffffff; }
+        .form-group input:focus, .form-group select:focus { border-color: var(--mada-blue); outline: none; }
+        .btn { background: var(--mada-green); color: #ffffff; border: none; padding: 14px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; transition: 0.3s; }
+        .btn:hover { background: #0e6344; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: right; border-bottom: 1px solid rgba(34, 34, 47, 0.5); font-size: 14px; }
+        th { background-color: #1c1c24; color: #ffffff; }
+        .badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .badge.success { background: rgba(0,200,83,0.1); color: var(--success-color); border: 1px solid var(--success-color); }
+        .badge.warning { background: rgba(255,23,72,0.1); color: #fff9c4; border: 1px solid #fff9c4; }
     </style>
 </head>
 <body>
 
-    <div class="navbar">
-        <button class="tab-btn active" onclick="openTab('dashboard')">📊 لوحة التحكم العامه</button>
-        <button class="tab-btn" onclick="openTab('patients')">👥 سجل الحسابات والمرضى</button>
-        <button class="tab-btn" onclick="openTab('doctors')">🩺 الطاقم الطبي والأطباء</button>
-    </div>
-
     <div class="main-header">
-        <div class="header-title">💻 نظام المتابعة الفورية والتشغيل لايف</div>
-        <div class="logo-box">
-            <img src="MADA LOGO.png" alt="MADA Physio Clinic">
+        <div class="header-info">
+            <h2>نظام المتابعة الفورية والتشغيل لايف 🖥️</h2>
+            <p>مركز مَدَى للعلاج الطبيعي والتأهيل الحركي</p>
+        </div>
+        <div class="logo-container">
+            <img src="MADA LOGO.png" alt="MADA Physio Clinic Logo">
         </div>
     </div>
 
-    <div id="dashboard" class="tab-content active">
-        <div class="metrics-grid">
-            <div class="metric-card"><h3>إيرادات اليوم الحقيقية</h3><div class="value">1,500 جنيه</div></div>
-            <div class="metric-card"><h3>إجمالي حالات اليوم</h3><div class="value">1 حالة</div></div>
-            <div class="metric-card"><h3>مصروفات تقديرية</h3><div class="value">450 جنيه</div></div>
-            <div class="metric-card"><h3>صافي الربح اللحظي</h3><div class="value" style="color: #2e7d32;">+ 1,050 جنيه</div></div>
+    <div class="navbar">
+        <button class="tab-btn active" onclick="switchTab('dashboard-tab')">📊 لوحة التحكم العامة</button>
+        <button class="tab-btn" onclick="switchTab('patients-tab')">👥 الحجوزات وسجل المرضى</button>
+        <button class="tab-btn" onclick="switchTab('doctors-tab')">🩺 الطاقم الطبي والأطباء</button>
+    </div>
+
+    <div id="dashboard-tab" class="tab-content active">
+        <div class="cards-container">
+            <div class="card profit"><h3>إيرادات اليوم الحقيقية</h3><div class="number" id="todayRevenue">0 جنيه</div></div>
+            <div class="card neutral"><h3>إجمالي حالات اليوم</h3><div class="number" id="todayCases">0 حالة</div></div>
+            <div class="card loss"><h3>مصروفات تقديرية للمركز</h3><div class="number">450 جنيه</div></div>
+            <div class="card profit"><h3>صافي الربح اللحظي</h3><div class="number" id="netProfit" style="color: var(--success-color);">0 جنيه</div></div>
         </div>
-        <div class="chart-box">
-            <canvas id="mainRevenueChart"></canvas>
+        <div class="chart-container">
+            <canvas id="salesChart"></canvas>
         </div>
     </div>
 
-    <div id="patients" class="tab-content">
-        <div class="split-layout">
-            <div class="panel">
-                <h3>إضافة حجز جديد</h3>
-                <form id="pForm">
-                    <div class="form-control"><label>اسم المريض</label><input type="text" required></div>
-                    <div class="form-control"><label>رقم الهاتف</label><input type="tel" required></div>
-                    <div class="form-control">
+    <div id="patients-tab" class="tab-content">
+        <div class="dashboard-layout">
+            <div class="form-section">
+                <h3>تسجيل حجز جديد</h3>
+                <form id="appointmentForm">
+                    <div class="form-group"><label>اسم المريض</label><input type="text" id="patientName" required></div>
+                    <div class="form-group"><label>رقم التليفون</label><input type="tel" id="patientPhone" required></div>
+                    <div class="form-group">
                         <label>نوع الخدمة</label>
-                        <select>
-                            <option>جلسة علاج طبيعي (200 جنيه)</option>
-                            <option>كشف جديد (300 جنيه)</option>
+                        <select id="serviceType" required>
+                            <option value="جلسة علاج طبيعي" data-price="200">جلسة علاج طبيعي (200 جنيه)</option>
+                            <option value="كشف جديد" data-price="300">كشف جديد (300 جنيه)</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn-submit">حفظ وتأكيد الحجز</button>
+                    <div class="form-group"><label>الدكتور المعالج</label><select id="doctorSelect" required></select></div>
+                    <button type="submit" class="btn">تقييد الحجز وحفظ البيانات</button>
                 </form>
             </div>
-            <div class="panel panel-large">
-                <h3>قائمة المرضى اليوم</h3>
+            <div class="table-section">
+                <h3>قائمة حجوزات اليوم</h3>
                 <table>
-                    <thead>
-                        <tr><th>اسم المريض</th><th>الخدمة</th><th>المبلغ</th><th>الحالة</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr><td><b>محمد علي</b></td><td>جلسة علاج طبيعي</td><td>200 جنيه</td><td><span style="color:green;">تم التأكيد</span></td></tr>
-                    </tbody>
+                    <thead><tr><th>اسم المريض</th><th>الخدمة</th><th>الدكتور</th><th>المبلغ</th><th>الحالة</th></tr></thead>
+                    <tbody id="appointmentsTable"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <div id="doctors" class="tab-content">
-        <div class="split-layout">
-            <div class="panel">
-                <h3>إدراج طبيب جديد بالمنظومة</h3>
-                <form id="dForm">
-                    <div class="form-control"><label>اسم الدكتور</label><input type="text" placeholder="د. الاسم ثنائي" required></div>
-                    <div class="form-control"><label>التخصص الدقيق</label><input type="text" placeholder="مثال: إصابات ملاعب / تأهيل" required></div>
-                    <button type="submit" class="btn-submit">إدراج دكتور بالمنظومة</button>
+    <div id="doctors-tab" class="tab-content">
+        <div class="dashboard-layout">
+            <div class="form-section">
+                <h3>إضافة طبيب جديد للمركز</h3>
+                <form id="doctorForm">
+                    <div class="form-group"><label>اسم الدكتور</label><input type="text" id="doctorNameInput" required></div>
+                    <div class="form-group"><label>التخصص الدقيق</label><input type="text" id="doctorSpecialty" required></div>
+                    <button type="submit" class="btn">إدراج دكتور بالمنظومة</button>
                 </form>
             </div>
-            <div class="panel panel-large">
+            <div class="table-section">
                 <h3>طاقم عمل مركز مَدَى الحالي</h3>
                 <table>
-                    <thead>
-                        <tr><th>اسم الطبيب</th><th>التخصص</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr><td><b>د. أحمد إسماعيل</b></td><td>علاج طبيعي وتأهيل حركي</td></tr>
-                        <tr><td><b>د. سارة ممدوح</b></td><td>إصابات ملاعب وعمود فقري</td></tr>
-                    </tbody>
+                    <thead><tr><th>اسم الطبيب</th><th>التخصص</th></tr></thead>
+                    <tbody id="doctorsTableBody"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
     <script>
-        // نظام التبديل السريع بين التابات بدون تهنيج
-        function openTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             event.currentTarget.classList.add('active');
+            if(tabId === 'dashboard-tab') calculateDashboardData();
         }
 
-        // رسم الرسم البياني الموحد
         document.addEventListener('DOMContentLoaded', () => {
-            const ctx = document.getElementById('mainRevenueChart').getContext('2d');
-            new Chart(ctx, {
+            initData();
+            loadDoctors();
+            loadAppointments();
+            calculateDashboardData();
+        });
+
+        function initData() {
+            if (!localStorage.getItem('clinic_doctors')) {
+                const defaultDocs = [
+                    { name: 'د. أحمد إسماعيل', specialty: 'علاج طبيعي وتأهيل حركي' },
+                    { name: 'د. سارة ممدوح', specialty: 'إصابات ملاعب وعمود فقري' }
+                ];
+                localStorage.setItem('clinic_doctors', JSON.stringify(defaultDocs));
+            }
+            if (!localStorage.getItem('clinic_appointments')) {
+                const defaultApps = [
+                    { name: 'محمد علي أحمد', service: 'جلسة علاج طبيعي', doctor: 'د. أحمد إسماعيل', price: 200, status: 'تمت الجلسة' },
+                    { name: 'محمود مصطفى', service: 'كشف جديد', doctor: 'د. سارة ممدوح', price: 300, status: 'في الانتظار' }
+                ];
+                localStorage.setItem('clinic_appointments', JSON.stringify(defaultApps));
+            }
+        }
+
+        function loadDoctors() {
+            const doctors = JSON.parse(localStorage.getItem('clinic_doctors')) || [];
+            const tableBody = document.getElementById('doctorsTableBody');
+            const selectDropdown = document.getElementById('doctorSelect');
+            tableBody.innerHTML = '';
+            selectDropdown.innerHTML = '';
+            doctors.forEach(doc => {
+                tableBody.innerHTML += `<tr><td><b>${doc.name}</b></td><td>${doc.specialty}</td></tr>`;
+                selectDropdown.innerHTML += `<option value="${doc.name}">${doc.name}</option>`;
+            });
+        }
+
+        function loadAppointments() {
+            const tableBody = document.getElementById('appointmentsTable');
+            tableBody.innerHTML = '';
+            let appointments = JSON.parse(localStorage.getItem('clinic_appointments')) || [];
+            appointments.forEach(app => {
+                const statusClass = app.status === 'في الانتظار' ? 'warning' : 'success';
+                tableBody.innerHTML += `<tr>
+                    <td><b>${app.name}</b></td>
+                    <td>${app.service}</td>
+                    <td>${app.doctor}</td>
+                    <td>${app.price} جنيه</td>
+                    <td><span class="badge ${statusClass}">${app.status}</span></td>
+                </tr>`;
+            });
+        }
+
+        function calculateDashboardData() {
+            let appointments = JSON.parse(localStorage.getItem('clinic_appointments')) || [];
+            let todayRevenue = 0;
+            appointments.forEach(app => { todayRevenue += parseFloat(app.price || 0); });
+            let estimatedLoss = 450; 
+            let netProfit = todayRevenue - estimatedLoss;
+
+            document.getElementById('todayRevenue').innerText = todayRevenue.toLocaleString() + ' جنيه';
+            document.getElementById('todayCases').innerText = appointments.length + ' حالة';
+            document.getElementById('netProfit').innerText = '+ ' + netProfit.toLocaleString() + ' جنيه';
+            initChart(todayRevenue);
+        }
+
+        let currentChart;
+        function initChart(revenue) {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            Chart.defaults.color = '#a0a0b0';
+            if (currentChart) currentChart.destroy();
+            currentChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'],
                     datasets: [{
                         label: 'حركة الإيرادات اليومية (بالجنيه)',
-                        data: [2500, 3100, 1800, 4000, 3200, 3600, 1500],
-                        borderColor: '#115e3b',
-                        backgroundColor: 'rgba(17, 94, 59, 0.05)',
+                        data: [2100, 3200, 1900, 4200, 2800, 3500, revenue],
+                        backgroundColor: 'rgba(77, 208, 225, 0.03)',
+                        borderColor: '#4dd0e1',
                         borderWidth: 2,
-                        tension: 0.3,
+                        tension: 0.4,
                         fill: true
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { grid: { color: 'rgba(34, 34, 47, 0.5)' } }, x: { grid: { display: false } } }
+                }
             });
-        });
+        }
     </script>
 </body>
 </html>
