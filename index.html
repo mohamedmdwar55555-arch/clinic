@@ -7,15 +7,20 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { 
-            --card-bg: rgba(22, 22, 30, 0.9); 
+            --card-bg: rgba(22, 22, 30, 0.92); 
             --mada-green: #0a4d34; 
+            --mada-green-hover: #0e6344;
             --mada-blue: #4dd0e1; 
             --text-main: #ffffff;
             --text-muted: #a0a0b0;
             --success-color: #00c853; 
-            --expense-color: #ff1744; 
+            --expense-color: #ff1744;
+            --warning-color: #ffc107;
+            --border-color: rgba(44, 44, 60, 0.8);
         }
         
+        * { box-sizing: border-box; }
+
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             margin: 0; 
@@ -23,7 +28,7 @@
             color: var(--text-main);
             min-height: 100vh;
             position: relative;
-            background-image: url('علاج طبيعي.png'); 
+            background-image: url('علاج_طبيعي.png'); 
             background-repeat: repeat; 
             background-position: center;
             background-attachment: fixed; 
@@ -33,255 +38,605 @@
         body::before {
             content: "";
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(14, 14, 18, 0.55); 
-            z-index: -1;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(11, 14, 18, 0.72); 
+            z-index: 0;
         }
-        
-        /* 🏛️ الهيدر الجديد باللون الأبيض */
+
+        body > * { position: relative; z-index: 1; }
+
+        /* ─── الهيدر ─── */
         .main-header { 
-            background-color: #ffffff; /* اللون الأبيض الذي طلبته */
-            padding: 15px 30px; 
+            background-color: #ffffff;
+            padding: 14px 28px; 
             display: flex; 
             align-items: center; 
             justify-content: space-between; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
-            border-radius: 12px;
-            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.35); 
+            border-radius: 14px;
+            margin-bottom: 20px;
             border-bottom: 3px solid var(--mada-blue);
         }
-        
-        /* تعديل النصوص لتظهر بوضوح على الخلفية البيضاء */
-        .header-info h2 { margin: 0; font-size: 20px; color: #000000; letter-spacing: 0.5px; }
-        .header-info p { margin: 5px 0 0 0; font-size: 13px; color: #555555; }
+        .header-info h2 { margin: 0; font-size: 20px; color: #111; letter-spacing: 0.4px; }
+        .header-info p  { margin: 4px 0 0 0; font-size: 13px; color: #555; }
+        .logo-container img { height: 55px; width: auto; object-fit: contain; }
 
-        .logo-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* ─── شريط التنقل ─── */
+        .navbar { 
+            background: var(--card-bg); 
+            padding: 8px; 
+            border-radius: 12px; 
+            margin-bottom: 22px; 
+            display: flex; 
+            gap: 10px; 
+            border: 1px solid var(--border-color); 
+            backdrop-filter: blur(8px); 
         }
-        .logo-container img {
-            height: 55px;
-            width: auto;
-            object-fit: contain;
-            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.1));
+        .tab-btn { 
+            background: none; 
+            border: none; 
+            color: var(--text-muted); 
+            font-weight: bold; 
+            padding: 11px 24px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 15px; 
+            transition: 0.25s; 
+            font-family: inherit;
         }
+        .tab-btn:hover  { background: rgba(255,255,255,0.06); color: #fff; }
+        .tab-btn.active { background: var(--mada-green); color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.4); }
 
-        /* ... بقية الكود يظل كما هو دون تغيير ... */
-        .navbar { background: var(--card-bg); padding: 8px; border-radius: 12px; margin-bottom: 25px; display: flex; gap: 10px; border: 1px solid rgba(34, 34, 47, 0.7); backdrop-filter: blur(5px); }
-        .tab-btn { background: none; border: none; color: var(--text-muted); font-weight: bold; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 15px; transition: 0.3s; }
-        .tab-btn:hover { background: rgba(30, 30, 42, 0.8); color: #ffffff; }
-        .tab-btn.active { background: var(--mada-green); color: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .cards-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 25px; }
-        .card { background: var(--card-bg); padding: 22px; border-radius: 12px; text-align: center; border: 1px solid rgba(34, 34, 47, 0.7); transition: 0.3s; backdrop-filter: blur(5px); }
-        .card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.5); }
-        .card.profit { border-top: 4px solid var(--success-color); }
-        .card.loss { border-top: 4px solid var(--expense-color); }
+
+        /* ─── بطاقات الإحصاء ─── */
+        .cards-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); 
+            gap: 18px; 
+            margin-bottom: 22px; 
+        }
+        .card { 
+            background: var(--card-bg); 
+            padding: 22px 20px; 
+            border-radius: 14px; 
+            text-align: center; 
+            border: 1px solid var(--border-color); 
+            transition: 0.25s; 
+            backdrop-filter: blur(8px); 
+        }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
+        .card.profit  { border-top: 4px solid var(--success-color); }
+        .card.loss    { border-top: 4px solid var(--expense-color); }
         .card.neutral { border-top: 4px solid var(--mada-blue); }
-        .card h3 { margin: 0 0 12px 0; color: var(--text-muted); font-size: 14px; }
-        .card .number { font-size: 28px; font-weight: bold; color: #ffffff; }
-        .chart-container { background: var(--card-bg); padding: 25px; border-radius: 12px; height: 380px; border: 1px solid rgba(34, 34, 47, 0.7); backdrop-filter: blur(5px); }
+        .card.warn    { border-top: 4px solid var(--warning-color); }
+        .card h3 { margin: 0 0 12px 0; color: var(--text-muted); font-size: 13px; font-weight: 600; }
+        .card .number { font-size: 28px; font-weight: bold; }
+        .card .sub { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+
+        /* ─── الشارت ─── */
+        .chart-container { 
+            background: var(--card-bg); 
+            padding: 25px; 
+            border-radius: 14px; 
+            height: 360px; 
+            border: 1px solid var(--border-color); 
+            backdrop-filter: blur(8px); 
+        }
+
+        /* ─── تخطيط النماذج والجداول ─── */
         .dashboard-layout { display: flex; gap: 20px; flex-wrap: wrap; }
-        .form-section { background: var(--card-bg); padding: 25px; border-radius: 12px; flex: 1; min-width: 300px; border: 1px solid rgba(34, 34, 47, 0.7); backdrop-filter: blur(5px); }
-        .table-section { background: var(--card-bg); padding: 25px; border-radius: 12px; flex: 2; min-width: 450px; border: 1px solid rgba(34, 34, 47, 0.7); backdrop-filter: blur(5px); }
-        h3 { margin-top: 0; color: #ffffff; border-bottom: 2px solid rgba(34, 34, 47, 0.7); padding-bottom: 10px; font-size: 16px; }
-        .form-group { margin-bottom: 15px; }
+        .form-section { 
+            background: var(--card-bg); 
+            padding: 25px; 
+            border-radius: 14px; 
+            flex: 1; 
+            min-width: 280px; 
+            border: 1px solid var(--border-color); 
+            backdrop-filter: blur(8px); 
+        }
+        .table-section { 
+            background: var(--card-bg); 
+            padding: 25px; 
+            border-radius: 14px; 
+            flex: 2; 
+            min-width: 430px; 
+            border: 1px solid var(--border-color); 
+            backdrop-filter: blur(8px); 
+        }
+
+        .section-header { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            margin-bottom: 18px; 
+            border-bottom: 1px solid var(--border-color); 
+            padding-bottom: 12px; 
+        }
+        .section-header h3 { margin: 0; color: #fff; font-size: 15px; }
+
+        /* ─── النماذج ─── */
+        .form-group { margin-bottom: 14px; }
         .form-group label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--text-muted); }
-        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #2c2c3c; border-radius: 8px; box-sizing: border-box; background: #1c1c24; color: #ffffff; }
-        .form-group input:focus, .form-group select:focus { border-color: var(--mada-blue); outline: none; }
-        .btn { background: var(--mada-green); color: #ffffff; border: none; padding: 14px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; transition: 0.3s; }
-        .btn:hover { background: #0e6344; }
+        .form-group input, .form-group select { 
+            width: 100%; 
+            padding: 11px 12px; 
+            border: 1px solid #2c2c3e; 
+            border-radius: 8px; 
+            background: #1a1a26; 
+            color: #fff; 
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus { 
+            border-color: var(--mada-blue); 
+            outline: none; 
+            box-shadow: 0 0 0 2px rgba(77,208,225,0.15);
+        }
+
+        /* ─── الأزرار ─── */
+        .btn { 
+            background: var(--mada-green); 
+            color: #fff; 
+            border: none; 
+            padding: 13px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            width: 100%; 
+            font-size: 15px; 
+            transition: 0.25s; 
+            font-family: inherit;
+        }
+        .btn:hover { background: var(--mada-green-hover); transform: translateY(-1px); }
+        .btn:active { transform: translateY(0); }
+
+        .btn-sm { 
+            padding: 5px 10px; 
+            font-size: 12px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            border: none; 
+            font-weight: bold; 
+            font-family: inherit;
+            transition: 0.2s;
+        }
+        .btn-danger  { background: rgba(255,23,68,0.12); color: #ff5252; border: 1px solid #ff5252; }
+        .btn-danger:hover { background: #ff5252; color: #fff; }
+        .btn-clear   { background: rgba(255,23,68,0.1); color: #ff6b6b; border: 1px solid rgba(255,23,68,0.4); padding: 7px 14px; font-size: 13px; border-radius: 7px; cursor: pointer; font-family: inherit; font-weight: bold; transition: 0.2s; }
+        .btn-clear:hover { background: rgba(255,23,68,0.25); }
+
+        /* ─── الجداول ─── */
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; text-align: right; border-bottom: 1px solid rgba(34, 34, 47, 0.5); font-size: 14px; }
-        th { background-color: #1c1c24; color: #ffffff; }
-        .badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-        .badge.success { background: rgba(0,200,83,0.1); color: var(--success-color); border: 1px solid var(--success-color); }
-        .badge.warning { background: rgba(255,23,72,0.1); color: #fff9c4; border: 1px solid #fff9c4; }
+        th, td { padding: 11px 12px; text-align: right; border-bottom: 1px solid rgba(44,44,60,0.6); font-size: 14px; }
+        th { background-color: rgba(26,26,38,0.8); color: var(--text-muted); font-weight: 600; font-size: 13px; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+
+        /* ─── الشارات ─── */
+        .badge { 
+            padding: 5px 10px; 
+            border-radius: 20px; 
+            font-size: 12px; 
+            font-weight: bold; 
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-block;
+        }
+        .badge:hover { opacity: 0.8; transform: scale(0.97); }
+        .badge.done    { background: rgba(0,200,83,0.12);  color: var(--success-color);  border: 1px solid var(--success-color); }
+        .badge.waiting { background: rgba(255,193,7,0.12); color: var(--warning-color); border: 1px solid var(--warning-color); }
+
+        /* ─── إشعار النجاح ─── */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--mada-green);
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+            transition: transform 0.35s ease;
+            z-index: 9999;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* ─── حالة فارغة ─── */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state .icon { font-size: 40px; margin-bottom: 10px; }
+        .empty-state p { margin: 0; font-size: 14px; }
     </style>
 </head>
 <body>
 
+    <!-- الهيدر -->
     <div class="main-header">
         <div class="header-info">
             <h2>نظام المتابعة الفورية والتشغيل لايف 🖥️</h2>
             <p>مركز مَدَى للعلاج الطبيعي والتأهيل الحركي</p>
         </div>
         <div class="logo-container">
-            <img src="MADA LOGO.png" alt="MADA Physio Clinic Logo">
+            <img src="MADA_LOGO.png" alt="MADA Physio Clinic">
         </div>
     </div>
 
+    <!-- شريط التنقل -->
     <div class="navbar">
-        <button class="tab-btn active" onclick="switchTab('dashboard-tab')">📊 لوحة التحكم العامة</button>
-        <button class="tab-btn" onclick="switchTab('patients-tab')">👥 الحجوزات وسجل المرضى</button>
-        <button class="tab-btn" onclick="switchTab('doctors-tab')">🩺 الطاقم الطبي والأطباء</button>
+        <button class="tab-btn active" onclick="switchTab('dashboard-tab', this)">📊 لوحة التحكم العامة</button>
+        <button class="tab-btn" onclick="switchTab('patients-tab', this)">👥 الحجوزات وسجل المرضى</button>
+        <button class="tab-btn" onclick="switchTab('doctors-tab', this)">🩺 الطاقم الطبي والأطباء</button>
     </div>
 
+    <!-- ══════════════ تاب الداشبورد ══════════════ -->
     <div id="dashboard-tab" class="tab-content active">
         <div class="cards-container">
-            <div class="card profit"><h3>إيرادات اليوم الحقيقية</h3><div class="number" id="todayRevenue">0 جنيه</div></div>
-            <div class="card neutral"><h3>إجمالي حالات اليوم</h3><div class="number" id="todayCases">0 حالة</div></div>
-            <div class="card loss"><h3>مصروفات تقديرية للمركز</h3><div class="number">450 جنيه</div></div>
-            <div class="card profit"><h3>صافي الربح اللحظي</h3><div class="number" id="netProfit" style="color: var(--success-color);">0 جنيه</div></div>
+            <div class="card profit">
+                <h3>إيرادات اليوم الفعلية</h3>
+                <div class="number" id="todayRevenue" style="color: var(--success-color);">0 جنيه</div>
+                <div class="sub">من الجلسات المنتهية فقط</div>
+            </div>
+            <div class="card neutral">
+                <h3>إجمالي حالات اليوم</h3>
+                <div class="number" id="todayCases">0 حالة</div>
+                <div class="sub" id="waitingCount">0 في الانتظار</div>
+            </div>
+            <div class="card loss">
+                <h3>مصروفات تقديرية للمركز</h3>
+                <div class="number" style="color: var(--expense-color);">450 جنيه</div>
+                <div class="sub">تكاليف يومية ثابتة</div>
+            </div>
+            <div class="card profit">
+                <h3>صافي الربح اللحظي</h3>
+                <div class="number" id="netProfit">0 جنيه</div>
+                <div class="sub">الإيرادات − المصروفات</div>
+            </div>
         </div>
         <div class="chart-container">
             <canvas id="salesChart"></canvas>
         </div>
     </div>
 
+    <!-- ══════════════ تاب الحجوزات ══════════════ -->
     <div id="patients-tab" class="tab-content">
         <div class="dashboard-layout">
             <div class="form-section">
-                <h3>تسجيل حجز جديد</h3>
-                <form id="appointmentForm">
-                    <div class="form-group"><label>اسم المريض</label><input type="text" id="patientName" required></div>
-                    <div class="form-group"><label>رقم التليفون</label><input type="tel" id="patientPhone" required></div>
-                    <div class="form-group">
-                        <label>نوع الخدمة</label>
-                        <select id="serviceType" required>
-                            <option value="جلسة علاج طبيعي" data-price="200">جلسة علاج طبيعي (200 جنيه)</option>
-                            <option value="كشف جديد" data-price="300">كشف جديد (300 جنيه)</option>
-                        </select>
-                    </div>
-                    <div class="form-group"><label>الدكتور المعالج</label><select id="doctorSelect" required></select></div>
-                    <button type="submit" class="btn">تقييد الحجز وحفظ البيانات</button>
-                </form>
+                <div class="section-header">
+                    <h3>تسجيل حجز جديد</h3>
+                </div>
+                <div class="form-group">
+                    <label>اسم المريض</label>
+                    <input type="text" id="patientName" placeholder="الاسم ثلاثي">
+                </div>
+                <div class="form-group">
+                    <label>رقم التليفون</label>
+                    <input type="tel" id="patientPhone" placeholder="01XXXXXXXXX">
+                </div>
+                <div class="form-group">
+                    <label>نوع الخدمة</label>
+                    <select id="serviceType">
+                        <option value="جلسة علاج طبيعي" data-price="200">جلسة علاج طبيعي — 200 جنيه</option>
+                        <option value="كشف جديد" data-price="300">كشف جديد — 300 جنيه</option>
+                        <option value="باكج تأهيل مكثف" data-price="1500">باكج تأهيل مكثف — 1500 جنيه</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>الدكتور المعالج</label>
+                    <select id="doctorSelect"></select>
+                </div>
+                <button class="btn" onclick="addAppointment()">✅ تأكيد الحجز وحفظ البيانات</button>
             </div>
+
             <div class="table-section">
-                <h3>قائمة حجوزات اليوم</h3>
+                <div class="section-header">
+                    <h3>قائمة حجوزات اليوم 📋</h3>
+                    <button class="btn-clear" onclick="clearAppointments()">🗑️ تصفير اليومية</button>
+                </div>
                 <table>
-                    <thead><tr><th>اسم المريض</th><th>الخدمة</th><th>الدكتور</th><th>المبلغ</th><th>الحالة</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>اسم المريض</th>
+                            <th>الخدمة</th>
+                            <th>الدكتور</th>
+                            <th>المبلغ</th>
+                            <th>الحالة</th>
+                            <th>حذف</th>
+                        </tr>
+                    </thead>
                     <tbody id="appointmentsTable"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
+    <!-- ══════════════ تاب الأطباء ══════════════ -->
     <div id="doctors-tab" class="tab-content">
         <div class="dashboard-layout">
             <div class="form-section">
-                <h3>إضافة طبيب جديد للمركز</h3>
-                <form id="doctorForm">
-                    <div class="form-group"><label>اسم الدكتور</label><input type="text" id="doctorNameInput" required></div>
-                    <div class="form-group"><label>التخصص الدقيق</label><input type="text" id="doctorSpecialty" required></div>
-                    <button type="submit" class="btn">إدراج دكتور بالمنظومة</button>
-                </form>
+                <div class="section-header">
+                    <h3>إضافة طبيب جديد</h3>
+                </div>
+                <div class="form-group">
+                    <label>اسم الدكتور</label>
+                    <input type="text" id="doctorNameInput" placeholder="د. الاسم الكامل">
+                </div>
+                <div class="form-group">
+                    <label>التخصص الدقيق</label>
+                    <input type="text" id="doctorSpecialty" placeholder="مثال: علاج طبيعي وتأهيل">
+                </div>
+                <button class="btn" onclick="addDoctor()">➕ إضافة للطاقم الطبي</button>
             </div>
+
             <div class="table-section">
-                <h3>طاقم عمل مركز مَدَى الحالي</h3>
+                <div class="section-header">
+                    <h3>طاقم عمل مركز مَدَى 🩺</h3>
+                </div>
                 <table>
-                    <thead><tr><th>اسم الطبيب</th><th>التخصص</th></tr></thead>
+                    <thead>
+                        <tr><th>اسم الطبيب</th><th>التخصص</th><th>حذف</th></tr>
+                    </thead>
                     <tbody id="doctorsTableBody"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
+    <!-- إشعار نجاح -->
+    <div class="toast" id="toast"></div>
+
     <script>
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
-            if(tabId === 'dashboard-tab') calculateDashboardData();
+        /* ══════════ مساعدات ══════════ */
+        const get = id => document.getElementById(id);
+        const getLS = key => JSON.parse(localStorage.getItem(key)) || [];
+        const setLS = (key, val) => localStorage.setItem(key, JSON.stringify(val));
+
+        function showToast(msg) {
+            const t = get('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2800);
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            initData();
-            loadDoctors();
-            loadAppointments();
-            calculateDashboardData();
-        });
-
+        /* ══════════ تهيئة البيانات الافتراضية ══════════ */
         function initData() {
             if (!localStorage.getItem('clinic_doctors')) {
-                const defaultDocs = [
-                    { name: 'د. أحمد إسماعيل', specialty: 'علاج طبيعي وتأهيل حركي' },
-                    { name: 'د. سارة ممدوح', specialty: 'إصابات ملاعب وعمود فقري' }
-                ];
-                localStorage.setItem('clinic_doctors', JSON.stringify(defaultDocs));
+                setLS('clinic_doctors', [
+                    { id: 1, name: 'د. أحمد إسماعيل', specialty: 'علاج طبيعي وتأهيل حركي' },
+                    { id: 2, name: 'د. سارة ممدوح',   specialty: 'إصابات ملاعب وعمود فقري' }
+                ]);
             }
             if (!localStorage.getItem('clinic_appointments')) {
-                const defaultApps = [
-                    { name: 'محمد علي أحمد', service: 'جلسة علاج طبيعي', doctor: 'د. أحمد إسماعيل', price: 200, status: 'تمت الجلسة' },
-                    { name: 'محمود مصطفى', service: 'كشف جديد', doctor: 'د. سارة ممدوح', price: 300, status: 'في الانتظار' }
-                ];
-                localStorage.setItem('clinic_appointments', JSON.stringify(defaultApps));
+                setLS('clinic_appointments', [
+                    { id: Date.now()-2, name: 'محمد علي أحمد', phone: '01012345678', service: 'جلسة علاج طبيعي', doctor: 'د. أحمد إسماعيل', price: 200, status: 'done' },
+                    { id: Date.now()-1, name: 'محمود مصطفى',   phone: '01098765432', service: 'كشف جديد',         doctor: 'د. سارة ممدوح',   price: 300, status: 'waiting' }
+                ]);
             }
         }
 
+        /* ══════════ التنقل بين التابات ══════════ */
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            get(tabId).classList.add('active');
+            btn.classList.add('active');
+            if (tabId === 'dashboard-tab') calculateDashboard();
+        }
+
+        /* ══════════ الأطباء ══════════ */
         function loadDoctors() {
-            const doctors = JSON.parse(localStorage.getItem('clinic_doctors')) || [];
-            const tableBody = document.getElementById('doctorsTableBody');
-            const selectDropdown = document.getElementById('doctorSelect');
-            tableBody.innerHTML = '';
-            selectDropdown.innerHTML = '';
-            doctors.forEach(doc => {
-                tableBody.innerHTML += `<tr><td><b>${doc.name}</b></td><td>${doc.specialty}</td></tr>`;
-                selectDropdown.innerHTML += `<option value="${doc.name}">${doc.name}</option>`;
-            });
+            const doctors = getLS('clinic_doctors');
+            const tbody   = get('doctorsTableBody');
+            const select  = get('doctorSelect');
+            tbody.innerHTML  = '';
+            select.innerHTML = '';
+
+            if (doctors.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3"><div class="empty-state"><div class="icon">🩺</div><p>لا يوجد أطباء مسجلون</p></div></td></tr>`;
+            } else {
+                doctors.forEach(doc => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><b>${doc.name}</b></td>
+                            <td>${doc.specialty}</td>
+                            <td><button class="btn-sm btn-danger" onclick="deleteDoctor(${doc.id})">🗑 حذف</button></td>
+                        </tr>`;
+                    select.innerHTML += `<option value="${doc.name}">${doc.name}</option>`;
+                });
+            }
         }
 
+        function addDoctor() {
+            const name      = get('doctorNameInput').value.trim();
+            const specialty = get('doctorSpecialty').value.trim();
+            if (!name || !specialty) { showToast('⚠️ من فضلك أدخل الاسم والتخصص'); return; }
+            const doctors = getLS('clinic_doctors');
+            doctors.push({ id: Date.now(), name, specialty });
+            setLS('clinic_doctors', doctors);
+            get('doctorNameInput').value = '';
+            get('doctorSpecialty').value = '';
+            loadDoctors();
+            showToast(`✅ تم إضافة ${name} للطاقم الطبي`);
+        }
+
+        function deleteDoctor(id) {
+            if (!confirm('هل أنت متأكد من حذف هذا الطبيب؟')) return;
+            let doctors = getLS('clinic_doctors').filter(d => d.id !== id);
+            setLS('clinic_doctors', doctors);
+            loadDoctors();
+            showToast('🗑️ تم حذف الطبيب');
+        }
+
+        /* ══════════ الحجوزات ══════════ */
         function loadAppointments() {
-            const tableBody = document.getElementById('appointmentsTable');
-            tableBody.innerHTML = '';
-            let appointments = JSON.parse(localStorage.getItem('clinic_appointments')) || [];
-            appointments.forEach(app => {
-                const statusClass = app.status === 'في الانتظار' ? 'warning' : 'success';
-                tableBody.innerHTML += `<tr>
-                    <td><b>${app.name}</b></td>
-                    <td>${app.service}</td>
-                    <td>${app.doctor}</td>
-                    <td>${app.price} جنيه</td>
-                    <td><span class="badge ${statusClass}">${app.status}</span></td>
-                </tr>`;
+            const apps  = getLS('clinic_appointments');
+            const tbody = get('appointmentsTable');
+            tbody.innerHTML = '';
+
+            if (apps.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">📋</div><p>لا توجد حجوزات اليوم</p></div></td></tr>`;
+                return;
+            }
+
+            apps.forEach(app => {
+                const isDone = app.status === 'done';
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${app.name}</b><br><small style="color:var(--text-muted)">${app.phone || ''}</small></td>
+                        <td>${app.service}</td>
+                        <td>${app.doctor}</td>
+                        <td><b>${app.price}</b> جنيه</td>
+                        <td>
+                            <span class="badge ${isDone ? 'done' : 'waiting'}" onclick="toggleStatus(${app.id})">
+                                ${isDone ? '✅ تم الدفع' : '⏳ في الانتظار'}
+                            </span>
+                        </td>
+                        <td><button class="btn-sm btn-danger" onclick="deleteAppointment(${app.id})">🗑</button></td>
+                    </tr>`;
             });
         }
 
-        function calculateDashboardData() {
-            let appointments = JSON.parse(localStorage.getItem('clinic_appointments')) || [];
-            let todayRevenue = 0;
-            appointments.forEach(app => { todayRevenue += parseFloat(app.price || 0); });
-            let estimatedLoss = 450; 
-            let netProfit = todayRevenue - estimatedLoss;
+        function addAppointment() {
+            const name    = get('patientName').value.trim();
+            const phone   = get('patientPhone').value.trim();
+            const selEl   = get('serviceType');
+            const service = selEl.value;
+            const price   = parseInt(selEl.options[selEl.selectedIndex].getAttribute('data-price'));
+            const doctor  = get('doctorSelect').value;
 
-            document.getElementById('todayRevenue').innerText = todayRevenue.toLocaleString() + ' جنيه';
-            document.getElementById('todayCases').innerText = appointments.length + ' حالة';
-            document.getElementById('netProfit').innerText = '+ ' + netProfit.toLocaleString() + ' جنيه';
-            initChart(todayRevenue);
+            if (!name || !phone || !doctor) { showToast('⚠️ من فضلك أكمل بيانات الحجز'); return; }
+
+            const apps = getLS('clinic_appointments');
+            apps.push({ id: Date.now(), name, phone, service, doctor, price, status: 'waiting' });
+            setLS('clinic_appointments', apps);
+
+            get('patientName').value  = '';
+            get('patientPhone').value = '';
+            loadAppointments();
+            calculateDashboard();
+            showToast(`✅ تم حجز ${name} بنجاح`);
         }
 
+        function toggleStatus(id) {
+            let apps = getLS('clinic_appointments').map(a => {
+                if (a.id === id) a.status = a.status === 'done' ? 'waiting' : 'done';
+                return a;
+            });
+            setLS('clinic_appointments', apps);
+            loadAppointments();
+            calculateDashboard();
+            showToast('✅ تم تحديث حالة الجلسة');
+        }
+
+        function deleteAppointment(id) {
+            if (!confirm('هل تريد حذف هذا الحجز؟')) return;
+            let apps = getLS('clinic_appointments').filter(a => a.id !== id);
+            setLS('clinic_appointments', apps);
+            loadAppointments();
+            calculateDashboard();
+            showToast('🗑️ تم حذف الحجز');
+        }
+
+        function clearAppointments() {
+            if (!confirm('هل أنت متأكد من تصفير بيانات اليوم كاملة؟')) return;
+            localStorage.removeItem('clinic_appointments');
+            loadAppointments();
+            calculateDashboard();
+            showToast('🔄 تم تصفير اليومية بنجاح');
+        }
+
+        /* ══════════ حسابات الداشبورد ══════════ */
+        function calculateDashboard() {
+            const apps    = getLS('clinic_appointments');
+            const doneApps  = apps.filter(a => a.status === 'done');
+            const waitApps  = apps.filter(a => a.status === 'waiting');
+            const revenue   = doneApps.reduce((s, a) => s + (a.price || 0), 0);
+            const expenses  = 450;
+            const netProfit = revenue - expenses;
+
+            get('todayRevenue').textContent = revenue.toLocaleString() + ' جنيه';
+            get('todayCases').textContent   = apps.length + ' حالة';
+            get('waitingCount').textContent = waitApps.length + ' في الانتظار';
+
+            const profitEl = get('netProfit');
+            if (netProfit >= 0) {
+                profitEl.style.color = 'var(--success-color)';
+                profitEl.textContent = '+ ' + netProfit.toLocaleString() + ' جنيه';
+            } else {
+                profitEl.style.color = 'var(--expense-color)';
+                profitEl.textContent = netProfit.toLocaleString() + ' جنيه';
+            }
+
+            initChart(revenue);
+        }
+
+        /* ══════════ الشارت ══════════ */
         let currentChart;
-        function initChart(revenue) {
-            const ctx = document.getElementById('salesChart').getContext('2d');
+        function initChart(todayRevenue) {
+            const ctx = get('salesChart').getContext('2d');
             Chart.defaults.color = '#a0a0b0';
+            Chart.defaults.font.family = "'Segoe UI', Tahoma, sans-serif";
             if (currentChart) currentChart.destroy();
+
             currentChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'],
                     datasets: [{
                         label: 'حركة الإيرادات اليومية (بالجنيه)',
-                        data: [2100, 3200, 1900, 4200, 2800, 3500, revenue],
-                        backgroundColor: 'rgba(77, 208, 225, 0.03)',
+                        data: [2100, 3200, 1900, 4200, 2800, 3500, todayRevenue],
+                        backgroundColor: 'rgba(77, 208, 225, 0.07)',
                         borderColor: '#4dd0e1',
-                        borderWidth: 2,
+                        borderWidth: 2.5,
                         tension: 0.4,
-                        fill: true
+                        fill: true,
+                        pointBackgroundColor: '#4dd0e1',
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: { y: { grid: { color: 'rgba(34, 34, 47, 0.5)' } }, x: { grid: { display: false } } }
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { labels: { color: '#a0a0b0', font: { size: 13 } } },
+                        tooltip: {
+                            backgroundColor: 'rgba(15,15,20,0.9)',
+                            borderColor: '#4dd0e1',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: ctx => ` ${ctx.parsed.y.toLocaleString()} جنيه`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            grid: { color: 'rgba(44,44,60,0.5)' },
+                            ticks: { callback: v => v.toLocaleString() }
+                        },
+                        x: { grid: { display: false } }
+                    }
                 }
             });
         }
+
+        /* ══════════ التشغيل عند الفتح ══════════ */
+        document.addEventListener('DOMContentLoaded', () => {
+            initData();
+            loadDoctors();
+            loadAppointments();
+            calculateDashboard();
+        });
     </script>
 </body>
 </html>
