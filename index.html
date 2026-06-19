@@ -1,642 +1,1155 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام مَدَى لإدارة العلاج الطبيعي - MADA Physio Clinic</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root { 
-            --card-bg: rgba(22, 22, 30, 0.92); 
-            --mada-green: #0a4d34; 
-            --mada-green-hover: #0e6344;
-            --mada-blue: #4dd0e1; 
-            --text-main: #ffffff;
-            --text-muted: #a0a0b0;
-            --success-color: #00c853; 
-            --expense-color: #ff1744;
-            --warning-color: #ffc107;
-            --border-color: rgba(44, 44, 60, 0.8);
-        }
-        
-        * { box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظام مَدَى — MADA Physio Clinic</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --card-bg:rgba(20,20,28,0.93);
+  --mada-green:#0a4d34;
+  --mada-green2:#0e6344;
+  --mada-blue:#4dd0e1;
+  --success:#00c853;
+  --danger:#ff1744;
+  --warning:#ffc107;
+  --text:#fff;
+  --muted:#9090a8;
+  --border:rgba(44,44,60,0.8);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Segoe UI',Tahoma,sans-serif;
+  padding:18px;
+  color:var(--text);
+  min-height:100vh;
+  background-image:url('علاج_طبيعي.png');
+  background-repeat:repeat;
+  background-attachment:fixed;
+  background-color:#080d0b;
+}
+body::before{content:"";position:fixed;inset:0;background:rgba(8,12,10,0.78);z-index:0;}
+body>*{position:relative;z-index:1;}
 
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 0; 
-            padding: 20px; 
-            color: var(--text-main);
-            min-height: 100vh;
-            position: relative;
-            background-image: url('علاج_طبيعي.png'); 
-            background-repeat: repeat; 
-            background-position: center;
-            background-attachment: fixed; 
-            background-color: #0b1511; 
-        }
+/* ── Header ── */
+.main-header{
+  background:#fff;
+  padding:12px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-radius:14px;
+  margin-bottom:16px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.35);
+  border-bottom:3px solid var(--mada-blue);
+}
+.header-info h2{font-size:18px;color:#111;}
+.header-info p{font-size:12px;color:#555;margin-top:3px;}
+.header-right{display:flex;align-items:center;gap:20px;}
+.clock-box{text-align:center;}
+.clock-date{font-size:13px;color:#333;font-weight:600;}
+.clock-time{font-size:22px;font-weight:bold;color:var(--mada-green);letter-spacing:2px;font-variant-numeric:tabular-nums;}
+.logo-container img{
+  height:52px;width:auto;
+  mix-blend-mode:multiply; /* يخفي الخلفية على الهيدر الأبيض */
+}
 
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-color: rgba(11, 14, 18, 0.72); 
-            z-index: 0;
-        }
+/* ── Navbar ── */
+.navbar{
+  background:var(--card-bg);
+  padding:7px;
+  border-radius:12px;
+  margin-bottom:18px;
+  display:flex;
+  gap:8px;
+  border:1px solid var(--border);
+  backdrop-filter:blur(8px);
+  flex-wrap:wrap;
+}
+.tab-btn{
+  background:none;border:none;color:var(--muted);
+  font-weight:bold;padding:10px 20px;border-radius:8px;
+  cursor:pointer;font-size:14px;transition:.2s;font-family:inherit;
+}
+.tab-btn:hover{background:rgba(255,255,255,.06);color:#fff;}
+.tab-btn.active{background:var(--mada-green);color:#fff;box-shadow:0 2px 10px rgba(0,0,0,.4);}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
 
-        body > * { position: relative; z-index: 1; }
+/* ── Cards ── */
+.cards-container{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:14px;margin-bottom:18px;}
+.card{
+  background:var(--card-bg);padding:18px 16px;border-radius:14px;
+  text-align:center;border:1px solid var(--border);
+  backdrop-filter:blur(8px);transition:.25s;
+}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.5);}
+.card.profit {border-top:4px solid var(--success);}
+.card.loss   {border-top:4px solid var(--danger);}
+.card.neutral{border-top:4px solid var(--mada-blue);}
+.card.cash   {border-top:4px solid #f59e0b;}
+.card.insta  {border-top:4px solid #8b5cf6;}
+.card.wallet {border-top:4px solid #06b6d4;}
+.card h3{color:var(--muted);font-size:12px;font-weight:600;margin-bottom:10px;}
+.card .number{font-size:24px;font-weight:bold;}
+.card .sub{font-size:11px;color:var(--muted);margin-top:5px;}
 
-        /* ─── الهيدر ─── */
-        .main-header { 
-            background-color: #ffffff;
-            padding: 14px 28px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.35); 
-            border-radius: 14px;
-            margin-bottom: 20px;
-            border-bottom: 3px solid var(--mada-blue);
-        }
-        .header-info h2 { margin: 0; font-size: 20px; color: #111; letter-spacing: 0.4px; }
-        .header-info p  { margin: 4px 0 0 0; font-size: 13px; color: #555; }
-        .logo-container img { height: 55px; width: auto; object-fit: contain; }
+/* خزنة الكاش */
+.safe-box{
+  background:var(--card-bg);border:1px solid var(--border);
+  border-radius:14px;padding:22px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:16px;margin-bottom:18px;
+  border-right:5px solid #f59e0b;
+  backdrop-filter:blur(8px);
+}
+.safe-info h3{color:#f59e0b;font-size:15px;margin-bottom:6px;}
+.safe-amount{font-size:34px;font-weight:bold;color:#f59e0b;}
+.safe-sub{font-size:12px;color:var(--muted);margin-top:4px;}
+.safe-actions{display:flex;gap:10px;flex-wrap:wrap;}
 
-        /* ─── شريط التنقل ─── */
-        .navbar { 
-            background: var(--card-bg); 
-            padding: 8px; 
-            border-radius: 12px; 
-            margin-bottom: 22px; 
-            display: flex; 
-            gap: 10px; 
-            border: 1px solid var(--border-color); 
-            backdrop-filter: blur(8px); 
-        }
-        .tab-btn { 
-            background: none; 
-            border: none; 
-            color: var(--text-muted); 
-            font-weight: bold; 
-            padding: 11px 24px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 15px; 
-            transition: 0.25s; 
-            font-family: inherit;
-        }
-        .tab-btn:hover  { background: rgba(255,255,255,0.06); color: #fff; }
-        .tab-btn.active { background: var(--mada-green); color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.4); }
+/* ── Chart ── */
+.chart-container{
+  background:var(--card-bg);padding:22px;border-radius:14px;
+  height:340px;border:1px solid var(--border);backdrop-filter:blur(8px);
+}
 
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+/* ── Layout ── */
+.dash-layout{display:flex;gap:18px;flex-wrap:wrap;}
+.form-section{
+  background:var(--card-bg);padding:22px;border-radius:14px;
+  flex:1;min-width:270px;border:1px solid var(--border);backdrop-filter:blur(8px);
+}
+.table-section{
+  background:var(--card-bg);padding:22px;border-radius:14px;
+  flex:2;min-width:420px;border:1px solid var(--border);backdrop-filter:blur(8px);
+}
+.section-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:16px;
+}
+.section-hdr h3{color:#fff;font-size:15px;}
 
-        /* ─── بطاقات الإحصاء ─── */
-        .cards-container { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); 
-            gap: 18px; 
-            margin-bottom: 22px; 
-        }
-        .card { 
-            background: var(--card-bg); 
-            padding: 22px 20px; 
-            border-radius: 14px; 
-            text-align: center; 
-            border: 1px solid var(--border-color); 
-            transition: 0.25s; 
-            backdrop-filter: blur(8px); 
-        }
-        .card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
-        .card.profit  { border-top: 4px solid var(--success-color); }
-        .card.loss    { border-top: 4px solid var(--expense-color); }
-        .card.neutral { border-top: 4px solid var(--mada-blue); }
-        .card.warn    { border-top: 4px solid var(--warning-color); }
-        .card h3 { margin: 0 0 12px 0; color: var(--text-muted); font-size: 13px; font-weight: 600; }
-        .card .number { font-size: 28px; font-weight: bold; }
-        .card .sub { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+/* ── Form elements ── */
+.form-group{margin-bottom:13px;}
+.form-group label{display:block;margin-bottom:5px;font-size:12px;color:var(--muted);}
+.form-group input,.form-group select,.form-group textarea{
+  width:100%;padding:10px 12px;border:1px solid #2c2c3e;border-radius:8px;
+  background:#16161f;color:#fff;font-size:13px;font-family:inherit;
+  transition:border-color .2s;
+}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+  border-color:var(--mada-blue);outline:none;box-shadow:0 0 0 2px rgba(77,208,225,.12);
+}
+.form-group textarea{resize:vertical;min-height:64px;}
 
-        /* ─── الشارت ─── */
-        .chart-container { 
-            background: var(--card-bg); 
-            padding: 25px; 
-            border-radius: 14px; 
-            height: 360px; 
-            border: 1px solid var(--border-color); 
-            backdrop-filter: blur(8px); 
-        }
+/* ── Buttons ── */
+.btn{
+  background:var(--mada-green);color:#fff;border:none;
+  padding:12px;border-radius:8px;cursor:pointer;font-weight:bold;
+  width:100%;font-size:14px;transition:.2s;font-family:inherit;
+}
+.btn:hover{background:var(--mada-green2);transform:translateY(-1px);}
+.btn-sm{
+  padding:5px 10px;font-size:12px;border-radius:6px;
+  cursor:pointer;border:none;font-weight:bold;font-family:inherit;transition:.2s;
+}
+.btn-danger{background:rgba(255,23,68,.1);color:#ff5252;border:1px solid #ff5252;}
+.btn-danger:hover{background:#ff5252;color:#fff;}
+.btn-outline{
+  background:none;color:var(--muted);border:1px solid var(--border);
+  padding:8px 16px;border-radius:8px;cursor:pointer;font-family:inherit;
+  font-size:13px;font-weight:bold;transition:.2s;
+}
+.btn-outline:hover{border-color:#fff;color:#fff;}
+.btn-amber{background:#f59e0b;color:#000;border:none;padding:10px 22px;border-radius:9px;cursor:pointer;font-weight:bold;font-family:inherit;font-size:14px;transition:.2s;}
+.btn-amber:hover{background:#d97706;}
+.btn-clear{background:rgba(255,23,68,.1);color:#ff6b6b;border:1px solid rgba(255,23,68,.35);padding:7px 14px;font-size:12px;border-radius:7px;cursor:pointer;font-family:inherit;font-weight:bold;transition:.2s;}
+.btn-clear:hover{background:rgba(255,23,68,.2);}
 
-        /* ─── تخطيط النماذج والجداول ─── */
-        .dashboard-layout { display: flex; gap: 20px; flex-wrap: wrap; }
-        .form-section { 
-            background: var(--card-bg); 
-            padding: 25px; 
-            border-radius: 14px; 
-            flex: 1; 
-            min-width: 280px; 
-            border: 1px solid var(--border-color); 
-            backdrop-filter: blur(8px); 
-        }
-        .table-section { 
-            background: var(--card-bg); 
-            padding: 25px; 
-            border-radius: 14px; 
-            flex: 2; 
-            min-width: 430px; 
-            border: 1px solid var(--border-color); 
-            backdrop-filter: blur(8px); 
-        }
+/* ── Tables ── */
+table{width:100%;border-collapse:collapse;}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid rgba(44,44,60,.5);font-size:13px;}
+th{background:rgba(22,22,30,.8);color:var(--muted);font-size:12px;font-weight:600;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.02);}
 
-        .section-header { 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            margin-bottom: 18px; 
-            border-bottom: 1px solid var(--border-color); 
-            padding-bottom: 12px; 
-        }
-        .section-header h3 { margin: 0; color: #fff; font-size: 15px; }
+/* ── Badges ── */
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:bold;display:inline-block;}
+.badge.done   {background:rgba(0,200,83,.1);  color:var(--success);border:1px solid var(--success);}
+.badge.waiting{background:rgba(255,193,7,.1); color:var(--warning);border:1px solid var(--warning);cursor:pointer;}
+.badge.waiting:hover{background:rgba(255,193,7,.2);}
+.pay-icon{font-size:15px;}
 
-        /* ─── النماذج ─── */
-        .form-group { margin-bottom: 14px; }
-        .form-group label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--text-muted); }
-        .form-group input, .form-group select { 
-            width: 100%; 
-            padding: 11px 12px; 
-            border: 1px solid #2c2c3e; 
-            border-radius: 8px; 
-            background: #1a1a26; 
-            color: #fff; 
-            font-size: 14px;
-            font-family: inherit;
-            transition: border-color 0.2s;
-        }
-        .form-group input:focus, .form-group select:focus { 
-            border-color: var(--mada-blue); 
-            outline: none; 
-            box-shadow: 0 0 0 2px rgba(77,208,225,0.15);
-        }
+/* ── Expense category pill ── */
+.exp-pill{
+  display:inline-block;padding:3px 9px;border-radius:12px;
+  font-size:11px;font-weight:bold;
+  background:rgba(77,208,225,.1);color:var(--mada-blue);border:1px solid rgba(77,208,225,.3);
+}
 
-        /* ─── الأزرار ─── */
-        .btn { 
-            background: var(--mada-green); 
-            color: #fff; 
-            border: none; 
-            padding: 13px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            width: 100%; 
-            font-size: 15px; 
-            transition: 0.25s; 
-            font-family: inherit;
-        }
-        .btn:hover { background: var(--mada-green-hover); transform: translateY(-1px); }
-        .btn:active { transform: translateY(0); }
+/* ── Monthly summary ── */
+.monthly-summary{margin-top:20px;}
+.monthly-summary h4{color:var(--muted);font-size:13px;margin-bottom:12px;border-top:1px solid var(--border);padding-top:14px;}
+.exp-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.exp-bar-label{width:140px;font-size:12px;color:var(--muted);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.exp-bar-track{flex:1;height:8px;background:rgba(44,44,60,.6);border-radius:4px;overflow:hidden;}
+.exp-bar-fill{height:100%;background:var(--mada-blue);border-radius:4px;transition:width .5s;}
+.exp-bar-val{font-size:12px;color:#fff;font-weight:600;min-width:70px;text-align:left;}
 
-        .btn-sm { 
-            padding: 5px 10px; 
-            font-size: 12px; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            border: none; 
-            font-weight: bold; 
-            font-family: inherit;
-            transition: 0.2s;
-        }
-        .btn-danger  { background: rgba(255,23,68,0.12); color: #ff5252; border: 1px solid #ff5252; }
-        .btn-danger:hover { background: #ff5252; color: #fff; }
-        .btn-clear   { background: rgba(255,23,68,0.1); color: #ff6b6b; border: 1px solid rgba(255,23,68,0.4); padding: 7px 14px; font-size: 13px; border-radius: 7px; cursor: pointer; font-family: inherit; font-weight: bold; transition: 0.2s; }
-        .btn-clear:hover { background: rgba(255,23,68,0.25); }
+/* ── Modal ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);
+  display:flex;align-items:center;justify-content:center;
+  z-index:1000;opacity:0;pointer-events:none;transition:.25s;
+}
+.modal-overlay.active{opacity:1;pointer-events:all;}
+.modal{
+  background:#16161f;border:1px solid var(--border);border-radius:16px;
+  padding:28px;width:90%;max-width:480px;max-height:90vh;overflow-y:auto;
+  transform:translateY(20px);transition:.25s;
+}
+.modal-overlay.active .modal{transform:translateY(0);}
+.modal h3{color:#fff;margin-bottom:20px;font-size:17px;border-bottom:1px solid var(--border);padding-bottom:12px;}
+.modal-info{background:rgba(77,208,225,.06);border:1px solid rgba(77,208,225,.2);border-radius:10px;padding:12px 16px;margin-bottom:18px;}
+.modal-info .mi-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0;}
+.modal-info .mi-row span:first-child{color:var(--muted);}
+.modal-info .mi-row b{color:#fff;}
 
-        /* ─── الجداول ─── */
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 11px 12px; text-align: right; border-bottom: 1px solid rgba(44,44,60,0.6); font-size: 14px; }
-        th { background-color: rgba(26,26,38,0.8); color: var(--text-muted); font-weight: 600; font-size: 13px; }
-        tr:last-child td { border-bottom: none; }
-        tr:hover td { background: rgba(255,255,255,0.02); }
+/* Payment method radios */
+.pay-methods{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+.pay-method-card{
+  flex:1;min-width:110px;border:2px solid var(--border);border-radius:10px;
+  padding:12px 8px;text-align:center;cursor:pointer;transition:.2s;
+  background:rgba(22,22,30,.6);
+}
+.pay-method-card:hover{border-color:var(--mada-blue);}
+.pay-method-card.selected{border-color:var(--mada-blue);background:rgba(77,208,225,.08);}
+.pay-method-card .pm-icon{font-size:22px;display:block;margin-bottom:6px;}
+.pay-method-card .pm-label{font-size:12px;color:var(--muted);font-weight:600;}
+.pay-method-card.selected .pm-label{color:var(--mada-blue);}
 
-        /* ─── الشارات ─── */
-        .badge { 
-            padding: 5px 10px; 
-            border-radius: 20px; 
-            font-size: 12px; 
-            font-weight: bold; 
-            cursor: pointer;
-            transition: 0.2s;
-            display: inline-block;
-        }
-        .badge:hover { opacity: 0.8; transform: scale(0.97); }
-        .badge.done    { background: rgba(0,200,83,0.12);  color: var(--success-color);  border: 1px solid var(--success-color); }
-        .badge.waiting { background: rgba(255,193,7,0.12); color: var(--warning-color); border: 1px solid var(--warning-color); }
+/* Image upload */
+.upload-area{
+  border:2px dashed var(--border);border-radius:10px;
+  padding:20px;text-align:center;cursor:pointer;transition:.2s;
+  margin-bottom:14px;
+}
+.upload-area:hover{border-color:var(--mada-blue);}
+.upload-area input{display:none;}
+.upload-area .up-icon{font-size:28px;margin-bottom:8px;}
+.upload-area p{font-size:13px;color:var(--muted);}
+#imagePreviewContainer{display:none;margin-bottom:12px;}
+#imagePreview{width:100%;max-height:200px;object-fit:contain;border-radius:8px;border:1px solid var(--border);}
 
-        /* ─── إشعار النجاح ─── */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(80px);
-            background: var(--mada-green);
-            color: #fff;
-            padding: 12px 28px;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 14px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-            transition: transform 0.35s ease;
-            z-index: 9999;
-        }
-        .toast.show { transform: translateX(-50%) translateY(0); }
+/* AI result */
+.ai-result{padding:12px 16px;border-radius:10px;font-size:13px;margin-top:12px;line-height:1.6;}
+.ai-result.ok  {background:rgba(0,200,83,.1);border:1px solid var(--success);color:var(--success);}
+.ai-result.warn{background:rgba(255,23,68,.1);border:1px solid var(--danger);color:#ff6b6b;}
+.modal-footer{display:flex;gap:10px;margin-top:20px;}
+.modal-footer .btn{flex:1;}
 
-        /* ─── حالة فارغة ─── */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-        }
-        .empty-state .icon { font-size: 40px; margin-bottom: 10px; }
-        .empty-state p { margin: 0; font-size: 14px; }
-    </style>
+/* Handover modal */
+.handover-amount-display{
+  font-size:42px;font-weight:bold;color:#f59e0b;
+  text-align:center;padding:20px 0;
+}
+.handover-history{margin-top:16px;max-height:200px;overflow-y:auto;}
+.hw-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.hw-row:last-child{border-bottom:none;}
+
+/* ── Toast ── */
+.toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(90px);
+  background:var(--mada-green);color:#fff;
+  padding:11px 26px;border-radius:10px;font-weight:bold;font-size:14px;
+  box-shadow:0 4px 16px rgba(0,0,0,.4);transition:transform .3s;z-index:9999;
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.warn-toast{background:#c05000;}
+
+/* Empty state */
+.empty-state{text-align:center;padding:36px 20px;color:var(--muted);}
+.empty-state .ei{font-size:36px;margin-bottom:8px;}
+.empty-state p{font-size:13px;}
+
+/* Responsive tweaks */
+@media(max-width:600px){
+  .main-header{flex-direction:column;gap:10px;text-align:center;}
+  .header-right{justify-content:center;}
+  .cards-container{grid-template-columns:1fr 1fr;}
+}
+</style>
 </head>
 <body>
 
-    <!-- الهيدر -->
-    <div class="main-header">
-        <div class="header-info">
-            <h2>نظام المتابعة الفورية والتشغيل لايف 🖥️</h2>
-            <p>مركز مَدَى للعلاج الطبيعي والتأهيل الحركي</p>
-        </div>
-        <div class="logo-container">
-            <img src="MADA_LOGO.png" alt="MADA Physio Clinic">
-        </div>
+<!-- ═══ HEADER ═══ -->
+<div class="main-header">
+  <div class="header-info">
+    <h2>نظام المتابعة الفورية والتشغيل لايف 🖥️</h2>
+    <p>مركز مَدَى للعلاج الطبيعي والتأهيل الحركي</p>
+  </div>
+  <div class="header-right">
+    <div class="clock-box">
+      <div class="clock-date" id="clockDate"></div>
+      <div class="clock-time" id="clockTime"></div>
+    </div>
+    <div class="logo-container">
+      <img src="MADA_LOGO.png" alt="MADA Physio Clinic">
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NAVBAR ═══ -->
+<div class="navbar">
+  <button class="tab-btn active" onclick="switchTab('tab-dashboard',this)">📊 لوحة التحكم</button>
+  <button class="tab-btn" onclick="switchTab('tab-expenses',this)">💸 المصروفات</button>
+  <button class="tab-btn" onclick="switchTab('tab-patients',this)">👥 الحجوزات والمرضى</button>
+  <button class="tab-btn" onclick="switchTab('tab-doctors',this)">🩺 الطاقم الطبي</button>
+</div>
+
+<!-- ═══ TAB: DASHBOARD ═══ -->
+<div id="tab-dashboard" class="tab-content active">
+  <!-- KPI Cards -->
+  <div class="cards-container">
+    <div class="card profit"><h3>إيرادات اليوم</h3><div class="number" id="kpiRevenue" style="color:var(--success)">0 جنيه</div><div class="sub">الجلسات المنتهية</div></div>
+    <div class="card cash">  <h3>💵 كاش</h3>      <div class="number" id="kpiCash"    style="color:#f59e0b">0 جنيه</div><div class="sub" id="kpiCashCount">0 معاملة</div></div>
+    <div class="card insta"> <h3>📱 انستاباي</h3>  <div class="number" id="kpiInsta"   style="color:#8b5cf6">0 جنيه</div><div class="sub" id="kpiInstaCount">0 معاملة</div></div>
+    <div class="card wallet"><h3>🏦 محفظة</h3>     <div class="number" id="kpiWallet"  style="color:#06b6d4">0 جنيه</div><div class="sub" id="kpiWalletCount">0 معاملة</div></div>
+    <div class="card neutral"><h3>حالات اليوم</h3> <div class="number" id="kpiCases">0 حالة</div><div class="sub" id="kpiWaiting">0 في الانتظار</div></div>
+    <div class="card loss">  <h3>مصروفات اليوم</h3><div class="number" id="kpiExpenses" style="color:var(--danger)">0 جنيه</div><div class="sub" id="kpiExpCount">0 بند</div></div>
+    <div class="card profit"><h3>صافي الربح</h3>   <div class="number" id="kpiNet">0 جنيه</div><div class="sub">إيرادات − مصروفات</div></div>
+  </div>
+
+  <!-- خزنة الكاش -->
+  <div class="safe-box">
+    <div class="safe-info">
+      <h3>💰 خزنة الكاش — عهدة السكرتارية</h3>
+      <div class="safe-amount" id="safeAmount">0 جنيه</div>
+      <div class="safe-sub" id="safeSince">منذ آخر توريد</div>
+    </div>
+    <div class="safe-actions">
+      <button class="btn-amber" onclick="openHandoverModal()">📤 توريد الخزنة للمالك</button>
+      <button class="btn-outline" onclick="openHandoverHistory()">📋 سجل التوريدات</button>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="chart-container">
+    <canvas id="salesChart"></canvas>
+  </div>
+</div>
+
+<!-- ═══ TAB: EXPENSES ═══ -->
+<div id="tab-expenses" class="tab-content">
+  <div class="dash-layout">
+    <div class="form-section">
+      <div class="section-hdr"><h3>تسجيل مصروف جديد</h3></div>
+      <div class="form-group">
+        <label>نوع المصروف</label>
+        <select id="expType">
+          <option value="مياه">💧 فاتورة مياه</option>
+          <option value="كهرباء">⚡ فاتورة كهرباء</option>
+          <option value="غاز">🔥 فاتورة غاز</option>
+          <option value="منظفات">🧹 منظفات وتنظيف</option>
+          <option value="مستلزمات طبية">💊 مستلزمات طبية</option>
+          <option value="صيانة">🔧 صيانة ومرافق</option>
+          <option value="رواتب">👤 رواتب</option>
+          <option value="إيجار">🏢 إيجار</option>
+          <option value="تسويق">📢 تسويق وإعلانات</option>
+          <option value="أخرى">📦 مصروفات أخرى</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>توصيف / تفاصيل</label>
+        <textarea id="expDesc" placeholder="مثال: فاتورة مياه شهر يونيو، منظف أرضيات..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>المبلغ (جنيه)</label>
+        <input type="number" id="expAmount" placeholder="0" min="1">
+      </div>
+      <button class="btn" onclick="addExpense()">💾 تسجيل المصروف</button>
     </div>
 
-    <!-- شريط التنقل -->
-    <div class="navbar">
-        <button class="tab-btn active" onclick="switchTab('dashboard-tab', this)">📊 لوحة التحكم العامة</button>
-        <button class="tab-btn" onclick="switchTab('patients-tab', this)">👥 الحجوزات وسجل المرضى</button>
-        <button class="tab-btn" onclick="switchTab('doctors-tab', this)">🩺 الطاقم الطبي والأطباء</button>
+    <div class="table-section">
+      <div class="section-hdr">
+        <h3>مصروفات اليوم</h3>
+        <button class="btn-clear" onclick="clearExpenses()">🗑️ مسح مصروفات اليوم</button>
+      </div>
+      <table>
+        <thead><tr><th>النوع</th><th>التوصيف</th><th>المبلغ</th><th>حذف</th></tr></thead>
+        <tbody id="expensesTable"></tbody>
+      </table>
+      <div class="monthly-summary">
+        <h4>📊 تحليل مصروفات الشهر — أكثر بند استهلاكاً</h4>
+        <div id="monthlyExpChart"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB: PATIENTS ═══ -->
+<div id="tab-patients" class="tab-content">
+  <div class="dash-layout">
+    <div class="form-section">
+      <div class="section-hdr"><h3>تسجيل حجز جديد</h3></div>
+      <div class="form-group"><label>اسم المريض</label><input type="text" id="patientName" placeholder="الاسم ثلاثي"></div>
+      <div class="form-group"><label>رقم التليفون</label><input type="tel" id="patientPhone" placeholder="01XXXXXXXXX"></div>
+      <div class="form-group">
+        <label>نوع الخدمة</label>
+        <select id="serviceType">
+          <option value="جلسة علاج طبيعي" data-price="200">جلسة علاج طبيعي — 200 جنيه</option>
+          <option value="كشف جديد" data-price="300">كشف جديد — 300 جنيه</option>
+          <option value="باكج تأهيل مكثف" data-price="1500">باكج تأهيل مكثف — 1500 جنيه</option>
+        </select>
+      </div>
+      <div class="form-group"><label>الدكتور المعالج</label><select id="doctorSelect"></select></div>
+      <button class="btn" onclick="addAppointment()">✅ تأكيد الحجز</button>
     </div>
 
-    <!-- ══════════════ تاب الداشبورد ══════════════ -->
-    <div id="dashboard-tab" class="tab-content active">
-        <div class="cards-container">
-            <div class="card profit">
-                <h3>إيرادات اليوم الفعلية</h3>
-                <div class="number" id="todayRevenue" style="color: var(--success-color);">0 جنيه</div>
-                <div class="sub">من الجلسات المنتهية فقط</div>
-            </div>
-            <div class="card neutral">
-                <h3>إجمالي حالات اليوم</h3>
-                <div class="number" id="todayCases">0 حالة</div>
-                <div class="sub" id="waitingCount">0 في الانتظار</div>
-            </div>
-            <div class="card loss">
-                <h3>مصروفات تقديرية للمركز</h3>
-                <div class="number" style="color: var(--expense-color);">450 جنيه</div>
-                <div class="sub">تكاليف يومية ثابتة</div>
-            </div>
-            <div class="card profit">
-                <h3>صافي الربح اللحظي</h3>
-                <div class="number" id="netProfit">0 جنيه</div>
-                <div class="sub">الإيرادات − المصروفات</div>
-            </div>
+    <div class="table-section">
+      <div class="section-hdr">
+        <h3>حجوزات اليوم 📋</h3>
+        <button class="btn-clear" onclick="clearAppointments()">🗑️ تصفير اليومية</button>
+      </div>
+      <table>
+        <thead><tr><th>المريض</th><th>الخدمة</th><th>الدكتور</th><th>المبلغ</th><th>الدفع</th><th>الحالة</th><th>حذف</th></tr></thead>
+        <tbody id="appointmentsTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB: DOCTORS ═══ -->
+<div id="tab-doctors" class="tab-content">
+  <div class="dash-layout">
+    <div class="form-section">
+      <div class="section-hdr"><h3>إضافة طبيب جديد</h3></div>
+      <div class="form-group"><label>اسم الدكتور</label><input type="text" id="doctorNameInput" placeholder="د. الاسم الكامل"></div>
+      <div class="form-group"><label>التخصص</label><input type="text" id="doctorSpecialty" placeholder="علاج طبيعي وتأهيل..."></div>
+      <button class="btn" onclick="addDoctor()">➕ إضافة للطاقم</button>
+    </div>
+    <div class="table-section">
+      <div class="section-hdr"><h3>طاقم مركز مَدَى 🩺</h3></div>
+      <table>
+        <thead><tr><th>الاسم</th><th>التخصص</th><th>حذف</th></tr></thead>
+        <tbody id="doctorsTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PAYMENT MODAL ═══ -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal">
+    <h3>💳 تسجيل دفع</h3>
+    <div class="modal-info" id="paymentModalInfo"></div>
+
+    <!-- Step 1: Payment method -->
+    <div id="payMethodStep">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">اختار وسيلة الدفع:</p>
+      <div class="pay-methods">
+        <div class="pay-method-card" onclick="selectPayMethod('cash',this)">
+          <span class="pm-icon">💵</span><span class="pm-label">كاش</span>
         </div>
-        <div class="chart-container">
-            <canvas id="salesChart"></canvas>
+        <div class="pay-method-card" onclick="selectPayMethod('instapay',this)">
+          <span class="pm-icon">📱</span><span class="pm-label">انستاباي</span>
         </div>
+        <div class="pay-method-card" onclick="selectPayMethod('wallet',this)">
+          <span class="pm-icon">🏦</span><span class="pm-label">محفظة بنكية</span>
+        </div>
+      </div>
     </div>
 
-    <!-- ══════════════ تاب الحجوزات ══════════════ -->
-    <div id="patients-tab" class="tab-content">
-        <div class="dashboard-layout">
-            <div class="form-section">
-                <div class="section-header">
-                    <h3>تسجيل حجز جديد</h3>
-                </div>
-                <div class="form-group">
-                    <label>اسم المريض</label>
-                    <input type="text" id="patientName" placeholder="الاسم ثلاثي">
-                </div>
-                <div class="form-group">
-                    <label>رقم التليفون</label>
-                    <input type="tel" id="patientPhone" placeholder="01XXXXXXXXX">
-                </div>
-                <div class="form-group">
-                    <label>نوع الخدمة</label>
-                    <select id="serviceType">
-                        <option value="جلسة علاج طبيعي" data-price="200">جلسة علاج طبيعي — 200 جنيه</option>
-                        <option value="كشف جديد" data-price="300">كشف جديد — 300 جنيه</option>
-                        <option value="باكج تأهيل مكثف" data-price="1500">باكج تأهيل مكثف — 1500 جنيه</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>الدكتور المعالج</label>
-                    <select id="doctorSelect"></select>
-                </div>
-                <button class="btn" onclick="addAppointment()">✅ تأكيد الحجز وحفظ البيانات</button>
-            </div>
-
-            <div class="table-section">
-                <div class="section-header">
-                    <h3>قائمة حجوزات اليوم 📋</h3>
-                    <button class="btn-clear" onclick="clearAppointments()">🗑️ تصفير اليومية</button>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>اسم المريض</th>
-                            <th>الخدمة</th>
-                            <th>الدكتور</th>
-                            <th>المبلغ</th>
-                            <th>الحالة</th>
-                            <th>حذف</th>
-                        </tr>
-                    </thead>
-                    <tbody id="appointmentsTable"></tbody>
-                </table>
-            </div>
-        </div>
+    <!-- Step 2: Image upload (conditional) -->
+    <div id="payImageStep" style="display:none">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">ارفع صورة الإيصال للتحقق:</p>
+      <label class="upload-area" for="receiptImage">
+        <div class="up-icon">📸</div>
+        <p>اضغط لرفع صورة الإيصال</p>
+        <input type="file" id="receiptImage" accept="image/*" onchange="handleImageUpload(event)">
+      </label>
+      <div id="imagePreviewContainer">
+        <img id="imagePreview" src="" alt="صورة الإيصال">
+      </div>
+      <button class="btn" id="analyzeBtn" onclick="analyzeImage()" style="display:none;margin-bottom:8px;">
+        🔍 تحليل الإيصال بالذكاء الاصطناعي
+      </button>
+      <div id="aiResultBox"></div>
     </div>
 
-    <!-- ══════════════ تاب الأطباء ══════════════ -->
-    <div id="doctors-tab" class="tab-content">
-        <div class="dashboard-layout">
-            <div class="form-section">
-                <div class="section-header">
-                    <h3>إضافة طبيب جديد</h3>
-                </div>
-                <div class="form-group">
-                    <label>اسم الدكتور</label>
-                    <input type="text" id="doctorNameInput" placeholder="د. الاسم الكامل">
-                </div>
-                <div class="form-group">
-                    <label>التخصص الدقيق</label>
-                    <input type="text" id="doctorSpecialty" placeholder="مثال: علاج طبيعي وتأهيل">
-                </div>
-                <button class="btn" onclick="addDoctor()">➕ إضافة للطاقم الطبي</button>
-            </div>
-
-            <div class="table-section">
-                <div class="section-header">
-                    <h3>طاقم عمل مركز مَدَى 🩺</h3>
-                </div>
-                <table>
-                    <thead>
-                        <tr><th>اسم الطبيب</th><th>التخصص</th><th>حذف</th></tr>
-                    </thead>
-                    <tbody id="doctorsTableBody"></tbody>
-                </table>
-            </div>
-        </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="confirmPayment()">✅ تأكيد الدفع</button>
+      <button class="btn-outline" onclick="closePaymentModal()" style="flex:1">إلغاء</button>
     </div>
+  </div>
+</div>
 
-    <!-- إشعار نجاح -->
-    <div class="toast" id="toast"></div>
+<!-- ═══ HANDOVER MODAL ═══ -->
+<div class="modal-overlay" id="handoverModal">
+  <div class="modal">
+    <h3>📤 توريد الخزنة للمالك</h3>
+    <div class="modal-info">
+      <div class="mi-row"><span>رصيد الكاش الحالي:</span><b id="hwCurrentAmount" style="color:#f59e0b">0 جنيه</b></div>
+      <div class="mi-row"><span>تاريخ اليوم:</span><b id="hwDate"></b></div>
+    </div>
+    <div class="form-group">
+      <label>ملاحظة (اختياري)</label>
+      <input type="text" id="hwNote" placeholder="مثال: توريد يومي — نهاية الشيفت">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-amber" style="background:#f59e0b;color:#000" onclick="confirmHandover()">💰 تأكيد التوريد وتصفير الخزنة</button>
+      <button class="btn-outline" onclick="closeHandoverModal()" style="flex:1">إلغاء</button>
+    </div>
+  </div>
+</div>
 
-    <script>
-        /* ══════════ مساعدات ══════════ */
-        const get = id => document.getElementById(id);
-        const getLS = key => JSON.parse(localStorage.getItem(key)) || [];
-        const setLS = (key, val) => localStorage.setItem(key, JSON.stringify(val));
+<!-- ═══ HANDOVER HISTORY MODAL ═══ -->
+<div class="modal-overlay" id="hwHistoryModal">
+  <div class="modal">
+    <h3>📋 سجل التوريدات</h3>
+    <div class="handover-history" id="hwHistoryList"></div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="get('hwHistoryModal').classList.remove('active')" style="width:100%">إغلاق</button>
+    </div>
+  </div>
+</div>
 
-        function showToast(msg) {
-            const t = get('toast');
-            t.textContent = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2800);
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ════════════════════════════════════════
+   UTILS
+════════════════════════════════════════ */
+const get = id => document.getElementById(id);
+const getLS = k => { try { return JSON.parse(localStorage.getItem(k)) || []; } catch { return []; } };
+const setLS = (k,v) => localStorage.setItem(k, JSON.stringify(v));
+
+function todayStr() {
+  return new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+}
+function monthStr() {
+  return todayStr().slice(0,7); // YYYY-MM
+}
+function appsKey(d)  { return 'mada_apps_'  + (d || todayStr()); }
+function expsKey(m)  { return 'mada_exps_'  + (m || monthStr()); }
+function docsKey()   { return 'mada_doctors'; }
+function hwKey()     { return 'mada_handovers'; }
+function cashKey()   { return 'mada_cash_balance'; }
+
+function getApps()       { return getLS(appsKey()); }
+function saveApps(a)     { setLS(appsKey(), a); }
+function getDocs()       { return getLS(docsKey()); }
+function saveDocs(d)     { setLS(docsKey(), d); }
+function getExps(m)      { return getLS(expsKey(m)); }
+function saveExps(e,m)   { setLS(expsKey(m), e); }
+function getHandovers()  { return getLS(hwKey()); }
+function saveHandovers(h){ setLS(hwKey(), h); }
+
+function getCashBalance() {
+  return parseFloat(localStorage.getItem(cashKey()) || '0');
+}
+function setCashBalance(v) {
+  localStorage.setItem(cashKey(), v.toString());
+}
+function addCash(v) { setCashBalance(getCashBalance() + v); }
+
+let toastTimer;
+function showToast(msg, warn=false) {
+  const t = get('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (warn ? ' warn-toast' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ════════════════════════════════════════
+   CLOCK
+════════════════════════════════════════ */
+const AR_DAYS = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const AR_MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+
+function updateClock() {
+  const now = new Date();
+  const day = AR_DAYS[now.getDay()];
+  const date = now.getDate();
+  const month = AR_MONTHS[now.getMonth()];
+  const year = now.getFullYear();
+  get('clockDate').textContent = `${day} ${date} ${month} ${year}`;
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  get('clockTime').textContent = `${h}:${m}:${s}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* ════════════════════════════════════════
+   TABS
+════════════════════════════════════════ */
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  get(tabId).classList.add('active');
+  btn.classList.add('active');
+  if (tabId === 'tab-dashboard') calculateDashboard();
+  if (tabId === 'tab-expenses') { loadExpenses(); renderMonthlyChart(); }
+}
+
+/* ════════════════════════════════════════
+   INIT
+════════════════════════════════════════ */
+function initData() {
+  if (!localStorage.getItem(docsKey())) {
+    saveDocs([
+      { id: 1, name: 'د. أحمد إسماعيل', specialty: 'علاج طبيعي وتأهيل حركي' },
+      { id: 2, name: 'د. سارة ممدوح',   specialty: 'إصابات ملاعب وعمود فقري' }
+    ]);
+  }
+  if (!localStorage.getItem(appsKey())) {
+    saveApps([
+      { id: Date.now()-2000, name: 'محمد علي أحمد', phone: '01012345678', service: 'جلسة علاج طبيعي', doctor: 'د. أحمد إسماعيل', price: 200, status: 'done',    paymentMethod: 'cash' },
+      { id: Date.now()-1000, name: 'محمود مصطفى',   phone: '01098765432', service: 'كشف جديد',         doctor: 'د. سارة ممدوح',   price: 300, status: 'waiting', paymentMethod: null }
+    ]);
+    setCashBalance(200); // seed cash from the sample done appointment
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initData();
+  loadDoctors();
+  loadAppointments();
+  calculateDashboard();
+});
+
+/* ════════════════════════════════════════
+   DOCTORS
+════════════════════════════════════════ */
+function loadDoctors() {
+  const docs = getDocs();
+  const tbody = get('doctorsTableBody');
+  const sel = get('doctorSelect');
+  tbody.innerHTML = '';
+  sel.innerHTML = '';
+  if (!docs.length) {
+    tbody.innerHTML = '<tr><td colspan="3"><div class="empty-state"><div class="ei">🩺</div><p>لا يوجد أطباء</p></div></td></tr>';
+    return;
+  }
+  docs.forEach(d => {
+    tbody.innerHTML += `<tr><td><b>${d.name}</b></td><td>${d.specialty}</td><td><button class="btn-sm btn-danger" onclick="deleteDoctor(${d.id})">🗑</button></td></tr>`;
+    sel.innerHTML += `<option value="${d.name}">${d.name}</option>`;
+  });
+}
+
+function addDoctor() {
+  const name = get('doctorNameInput').value.trim();
+  const spec = get('doctorSpecialty').value.trim();
+  if (!name || !spec) { showToast('⚠️ أدخل الاسم والتخصص', true); return; }
+  const docs = getDocs();
+  docs.push({ id: Date.now(), name, specialty: spec });
+  saveDocs(docs);
+  get('doctorNameInput').value = '';
+  get('doctorSpecialty').value = '';
+  loadDoctors();
+  showToast(`✅ تم إضافة ${name}`);
+}
+
+function deleteDoctor(id) {
+  if (!confirm('حذف هذا الطبيب؟')) return;
+  saveDocs(getDocs().filter(d => d.id !== id));
+  loadDoctors();
+  showToast('🗑️ تم الحذف');
+}
+
+/* ════════════════════════════════════════
+   APPOINTMENTS
+════════════════════════════════════════ */
+function loadAppointments() {
+  const apps = getApps();
+  const tbody = get('appointmentsTable');
+  tbody.innerHTML = '';
+
+  if (!apps.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="ei">📋</div><p>لا توجد حجوزات اليوم</p></div></td></tr>';
+    return;
+  }
+
+  const payIcons = { cash: '💵 كاش', instapay: '📱 انستا', wallet: '🏦 محفظة', null: '—' };
+
+  apps.forEach(app => {
+    const isDone = app.status === 'done';
+    const payLabel = payIcons[app.paymentMethod] || '—';
+    tbody.innerHTML += `
+      <tr>
+        <td><b>${app.name}</b><br><small style="color:var(--muted)">${app.phone||''}</small></td>
+        <td>${app.service}</td>
+        <td>${app.doctor}</td>
+        <td><b>${app.price}</b> ج</td>
+        <td><span style="font-size:12px">${isDone ? payLabel : '—'}</span></td>
+        <td>
+          ${isDone
+            ? '<span class="badge done">✅ تم الدفع</span>'
+            : `<span class="badge waiting" onclick="openPaymentModal(${app.id})">⏳ اضغط للدفع</span>`
+          }
+        </td>
+        <td><button class="btn-sm btn-danger" onclick="deleteAppointment(${app.id})">🗑</button></td>
+      </tr>`;
+  });
+}
+
+function addAppointment() {
+  const name   = get('patientName').value.trim();
+  const phone  = get('patientPhone').value.trim();
+  const selEl  = get('serviceType');
+  const service= selEl.value;
+  const price  = parseInt(selEl.options[selEl.selectedIndex].getAttribute('data-price'));
+  const doctor = get('doctorSelect').value;
+  if (!name || !phone || !doctor) { showToast('⚠️ أكمل بيانات الحجز', true); return; }
+  const apps = getApps();
+  apps.push({ id: Date.now(), name, phone, service, doctor, price, status: 'waiting', paymentMethod: null });
+  saveApps(apps);
+  get('patientName').value = '';
+  get('patientPhone').value = '';
+  loadAppointments();
+  calculateDashboard();
+  showToast(`✅ تم حجز ${name}`);
+}
+
+function deleteAppointment(id) {
+  if (!confirm('حذف هذا الحجز؟')) return;
+  let apps = getApps();
+  const app = apps.find(a => a.id === id);
+  // If deleting a done cash payment, subtract from cash balance
+  if (app && app.status === 'done' && app.paymentMethod === 'cash') {
+    setCashBalance(Math.max(0, getCashBalance() - app.price));
+  }
+  apps = apps.filter(a => a.id !== id);
+  saveApps(apps);
+  loadAppointments();
+  calculateDashboard();
+  showToast('🗑️ تم حذف الحجز');
+}
+
+function clearAppointments() {
+  if (!confirm('تصفير جميع حجوزات اليوم؟')) return;
+  // Remove cash from balance for all done cash appointments
+  const apps = getApps();
+  const cashPaid = apps.filter(a => a.status==='done' && a.paymentMethod==='cash').reduce((s,a)=>s+a.price,0);
+  setCashBalance(Math.max(0, getCashBalance() - cashPaid));
+  localStorage.removeItem(appsKey());
+  loadAppointments();
+  calculateDashboard();
+  showToast('🔄 تم تصفير اليومية');
+}
+
+/* ════════════════════════════════════════
+   PAYMENT MODAL
+════════════════════════════════════════ */
+let _payAppId = null;
+let _payMethod = null;
+let _imgData = null;
+let _imgType = null;
+
+function openPaymentModal(appId) {
+  const app = getApps().find(a => a.id === appId);
+  if (!app) return;
+  _payAppId = appId;
+  _payMethod = null;
+  _imgData = null;
+  _imgType = null;
+
+  get('paymentModalInfo').innerHTML = `
+    <div class="mi-row"><span>المريض:</span><b>${app.name}</b></div>
+    <div class="mi-row"><span>الخدمة:</span><b>${app.service}</b></div>
+    <div class="mi-row"><span>المبلغ المطلوب:</span><b style="color:var(--mada-blue);font-size:16px">${app.price} جنيه</b></div>`;
+
+  // Reset UI
+  document.querySelectorAll('.pay-method-card').forEach(c => c.classList.remove('selected'));
+  get('payImageStep').style.display = 'none';
+  get('imagePreviewContainer').style.display = 'none';
+  get('analyzeBtn').style.display = 'none';
+  get('aiResultBox').innerHTML = '';
+  get('receiptImage').value = '';
+
+  get('paymentModal').classList.add('active');
+}
+
+function closePaymentModal() {
+  get('paymentModal').classList.remove('active');
+  _payAppId = null;
+}
+
+function selectPayMethod(method, el) {
+  _payMethod = method;
+  document.querySelectorAll('.pay-method-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+
+  const needsImage = method === 'instapay' || method === 'wallet';
+  get('payImageStep').style.display = needsImage ? 'block' : 'none';
+  if (!needsImage) {
+    get('imagePreviewContainer').style.display = 'none';
+    get('analyzeBtn').style.display = 'none';
+    get('aiResultBox').innerHTML = '';
+  }
+}
+
+function handleImageUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const url = e.target.result;
+    const [, data] = url.split(',');
+    _imgData = data;
+    _imgType = file.type || 'image/jpeg';
+    get('imagePreview').src = url;
+    get('imagePreviewContainer').style.display = 'block';
+    get('analyzeBtn').style.display = 'block';
+    get('aiResultBox').innerHTML = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function analyzeImage() {
+  const app = getApps().find(a => a.id === _payAppId);
+  if (!app || !_imgData) { showToast('⚠️ ارفع الصورة أولاً', true); return; }
+
+  const btn = get('analyzeBtn');
+  btn.textContent = '⏳ جاري التحليل...';
+  btn.disabled = true;
+  get('aiResultBox').innerHTML = '';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 300,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: _imgType, data: _imgData } },
+            { type: 'text',  text: `هذا إيصال دفع إلكتروني. المبلغ المطلوب هو ${app.price} جنيه مصري. استخرج المبلغ الذي ظهر في الإيصال. أجب فقط بهذا JSON بدون أي كلام آخر أو backticks: {"extracted_amount": NUMBER_OR_NULL, "match": BOOLEAN, "note": "ملاحظة قصيرة جداً بالعربي"}` }
+          ]
+        }]
+      })
+    });
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+
+    const rawText = (data.content || []).map(i => i.text || '').join('');
+    let result;
+    try {
+      result = JSON.parse(rawText.replace(/```json|```/g,'').trim());
+    } catch {
+      result = { extracted_amount: null, match: false, note: 'تعذر قراءة الإيصال بوضوح' };
+    }
+
+    if (result.match) {
+      get('aiResultBox').innerHTML = `<div class="ai-result ok">✅ المبلغ متطابق — تم رصد <b>${result.extracted_amount} جنيه</b> في الإيصال</div>`;
+    } else {
+      get('aiResultBox').innerHTML = `<div class="ai-result warn">
+        ⚠️ <b>تنبيه: المبلغ غير متطابق!</b><br>
+        المطلوب: <b>${app.price} جنيه</b> &nbsp;|&nbsp; في الإيصال: <b>${result.extracted_amount ?? 'غير واضح'} جنيه</b><br>
+        <small style="opacity:.8">${result.note || ''}</small>
+      </div>`;
+      showToast('⚠️ المبلغ غير متطابق — راجع الإيصال', true);
+    }
+
+  } catch (err) {
+    get('aiResultBox').innerHTML = `<div class="ai-result warn">⚠️ تعذر التحليل: ${err.message}</div>`;
+  }
+
+  btn.textContent = '🔍 تحليل الإيصال بالذكاء الاصطناعي';
+  btn.disabled = false;
+}
+
+function confirmPayment() {
+  if (!_payMethod) { showToast('⚠️ اختار وسيلة الدفع أولاً', true); return; }
+  if ((_payMethod === 'instapay' || _payMethod === 'wallet') && !_imgData) {
+    showToast('⚠️ ارفع صورة الإيصال أولاً', true); return;
+  }
+
+  let apps = getApps();
+  const app = apps.find(a => a.id === _payAppId);
+  if (!app) return;
+
+  apps = apps.map(a => {
+    if (a.id === _payAppId) {
+      a.status = 'done';
+      a.paymentMethod = _payMethod;
+      a.paidAt = new Date().toISOString();
+    }
+    return a;
+  });
+  saveApps(apps);
+
+  if (_payMethod === 'cash') addCash(app.price);
+
+  loadAppointments();
+  calculateDashboard();
+  closePaymentModal();
+
+  const labels = { cash: 'كاش 💵', instapay: 'انستاباي 📱', wallet: 'محفظة بنكية 🏦' };
+  showToast(`✅ تم تسجيل دفع ${app.price} جنيه — ${labels[_payMethod]}`);
+}
+
+/* ════════════════════════════════════════
+   EXPENSES
+════════════════════════════════════════ */
+function loadExpenses() {
+  const exps = getExps();
+  const tbody = get('expensesTable');
+  tbody.innerHTML = '';
+
+  const todayExps = exps.filter(e => e.date === todayStr());
+
+  if (!todayExps.length) {
+    tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="ei">💸</div><p>لا توجد مصروفات اليوم</p></div></td></tr>';
+    return;
+  }
+  todayExps.forEach(e => {
+    tbody.innerHTML += `
+      <tr>
+        <td><span class="exp-pill">${e.type}</span></td>
+        <td style="color:var(--muted);font-size:12px">${e.desc}</td>
+        <td><b>${e.amount}</b> ج</td>
+        <td><button class="btn-sm btn-danger" onclick="deleteExpense(${e.id})">🗑</button></td>
+      </tr>`;
+  });
+}
+
+function addExpense() {
+  const type   = get('expType').value;
+  const desc   = get('expDesc').value.trim();
+  const amount = parseFloat(get('expAmount').value);
+  if (!desc || !amount || amount <= 0) { showToast('⚠️ أكمل بيانات المصروف', true); return; }
+  const exps = getExps();
+  exps.push({ id: Date.now(), type, desc, amount, date: todayStr() });
+  saveExps(exps);
+  get('expDesc').value = '';
+  get('expAmount').value = '';
+  loadExpenses();
+  renderMonthlyChart();
+  calculateDashboard();
+  showToast('✅ تم تسجيل المصروف');
+}
+
+function deleteExpense(id) {
+  const exps = getExps().filter(e => e.id !== id);
+  saveExps(exps);
+  loadExpenses();
+  renderMonthlyChart();
+  calculateDashboard();
+  showToast('🗑️ تم حذف المصروف');
+}
+
+function clearExpenses() {
+  if (!confirm('مسح مصروفات اليوم؟')) return;
+  const exps = getExps().filter(e => e.date !== todayStr());
+  saveExps(exps);
+  loadExpenses();
+  renderMonthlyChart();
+  calculateDashboard();
+  showToast('🔄 تم مسح مصروفات اليوم');
+}
+
+function renderMonthlyChart() {
+  const exps = getExps(); // this month
+  const container = get('monthlyExpChart');
+
+  // Aggregate by type
+  const totals = {};
+  exps.forEach(e => { totals[e.type] = (totals[e.type] || 0) + e.amount; });
+  const entries = Object.entries(totals).sort((a,b) => b[1]-a[1]);
+
+  if (!entries.length) {
+    container.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:10px">لا توجد مصروفات هذا الشهر</p>';
+    return;
+  }
+
+  const max = entries[0][1];
+  container.innerHTML = entries.map(([type, total]) => `
+    <div class="exp-bar-row">
+      <div class="exp-bar-label">${type}</div>
+      <div class="exp-bar-track">
+        <div class="exp-bar-fill" style="width:${Math.round(total/max*100)}%"></div>
+      </div>
+      <div class="exp-bar-val">${total.toLocaleString()} ج</div>
+    </div>`).join('');
+}
+
+/* ════════════════════════════════════════
+   DASHBOARD
+════════════════════════════════════════ */
+let mainChart;
+
+function calculateDashboard() {
+  const apps = getApps();
+  const done = apps.filter(a => a.status === 'done');
+  const waiting = apps.filter(a => a.status === 'waiting');
+
+  const cash   = done.filter(a => a.paymentMethod === 'cash');
+  const insta  = done.filter(a => a.paymentMethod === 'instapay');
+  const wallet = done.filter(a => a.paymentMethod === 'wallet');
+
+  const sumOf = arr => arr.reduce((s,a) => s + (a.price||0), 0);
+  const totalRev = sumOf(done);
+  const cashRev  = sumOf(cash);
+  const instaRev = sumOf(insta);
+  const walletRev= sumOf(wallet);
+
+  // Expenses (today)
+  const exps = getExps();
+  const todayExps = exps.filter(e => e.date === todayStr());
+  const totalExp  = todayExps.reduce((s,e) => s + (e.amount||0), 0);
+
+  const net = totalRev - totalExp;
+
+  get('kpiRevenue').textContent = totalRev.toLocaleString() + ' ج';
+  get('kpiCash').textContent    = cashRev.toLocaleString()  + ' ج';
+  get('kpiInsta').textContent   = instaRev.toLocaleString() + ' ج';
+  get('kpiWallet').textContent  = walletRev.toLocaleString()+ ' ج';
+  get('kpiCashCount').textContent   = cash.length   + ' معاملة';
+  get('kpiInstaCount').textContent  = insta.length  + ' معاملة';
+  get('kpiWalletCount').textContent = wallet.length + ' معاملة';
+  get('kpiCases').textContent   = apps.length   + ' حالة';
+  get('kpiWaiting').textContent = waiting.length + ' في الانتظار';
+  get('kpiExpenses').textContent= totalExp.toLocaleString() + ' ج';
+  get('kpiExpCount').textContent= todayExps.length + ' بند';
+
+  const netEl = get('kpiNet');
+  netEl.textContent = (net >= 0 ? '+ ' : '') + net.toLocaleString() + ' ج';
+  netEl.style.color = net >= 0 ? 'var(--success)' : 'var(--danger)';
+
+  // Safe box
+  const cashBal = getCashBalance();
+  get('safeAmount').textContent = cashBal.toLocaleString() + ' جنيه';
+  const hws = getHandovers();
+  const lastHw = hws.length ? hws[hws.length-1] : null;
+  get('safeSince').textContent = lastHw ? 'آخر توريد: ' + new Date(lastHw.date).toLocaleDateString('ar-EG') : 'لم يتم توريد بعد';
+
+  initWeeklyChart(totalRev);
+}
+
+function initWeeklyChart(todayRev) {
+  const ctx = get('salesChart').getContext('2d');
+  Chart.defaults.color = '#9090a8';
+  Chart.defaults.font.family = "'Segoe UI', Tahoma, sans-serif";
+
+  // Build last 7 days labels
+  const labels = [];
+  const data = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().split('T')[0];
+    labels.push(AR_DAYS[d.getDay()]);
+    if (i === 0) {
+      data.push(todayRev);
+    } else {
+      const hist = getLS(appsKey(key)).filter(a => a.status==='done').reduce((s,a)=>s+(a.price||0),0);
+      data.push(hist);
+    }
+  }
+
+  if (mainChart) mainChart.destroy();
+  mainChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'الإيرادات اليومية (جنيه)',
+        data,
+        backgroundColor: 'rgba(77,208,225,0.06)',
+        borderColor: '#4dd0e1',
+        borderWidth: 2.5,
+        tension: 0.4,
+        fill: true,
+        pointBackgroundColor: '#4dd0e1',
+        pointRadius: 5,
+        pointHoverRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#9090a8', font: { size: 13 } } },
+        tooltip: {
+          backgroundColor: 'rgba(12,12,18,0.95)',
+          borderColor: '#4dd0e1',
+          borderWidth: 1,
+          callbacks: { label: c => ` ${c.parsed.y.toLocaleString()} جنيه` }
         }
+      },
+      scales: {
+        y: { grid: { color: 'rgba(44,44,60,.4)' }, ticks: { callback: v => v.toLocaleString() } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
 
-        /* ══════════ تهيئة البيانات الافتراضية ══════════ */
-        function initData() {
-            if (!localStorage.getItem('clinic_doctors')) {
-                setLS('clinic_doctors', [
-                    { id: 1, name: 'د. أحمد إسماعيل', specialty: 'علاج طبيعي وتأهيل حركي' },
-                    { id: 2, name: 'د. سارة ممدوح',   specialty: 'إصابات ملاعب وعمود فقري' }
-                ]);
-            }
-            if (!localStorage.getItem('clinic_appointments')) {
-                setLS('clinic_appointments', [
-                    { id: Date.now()-2, name: 'محمد علي أحمد', phone: '01012345678', service: 'جلسة علاج طبيعي', doctor: 'د. أحمد إسماعيل', price: 200, status: 'done' },
-                    { id: Date.now()-1, name: 'محمود مصطفى',   phone: '01098765432', service: 'كشف جديد',         doctor: 'د. سارة ممدوح',   price: 300, status: 'waiting' }
-                ]);
-            }
-        }
+/* ════════════════════════════════════════
+   HANDOVER (توريد)
+════════════════════════════════════════ */
+function openHandoverModal() {
+  const bal = getCashBalance();
+  get('hwCurrentAmount').textContent = bal.toLocaleString() + ' جنيه';
+  get('hwDate').textContent = new Date().toLocaleDateString('ar-EG', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  get('hwNote').value = '';
+  get('handoverModal').classList.add('active');
+}
 
-        /* ══════════ التنقل بين التابات ══════════ */
-        function switchTab(tabId, btn) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            get(tabId).classList.add('active');
-            btn.classList.add('active');
-            if (tabId === 'dashboard-tab') calculateDashboard();
-        }
+function closeHandoverModal() {
+  get('handoverModal').classList.remove('active');
+}
 
-        /* ══════════ الأطباء ══════════ */
-        function loadDoctors() {
-            const doctors = getLS('clinic_doctors');
-            const tbody   = get('doctorsTableBody');
-            const select  = get('doctorSelect');
-            tbody.innerHTML  = '';
-            select.innerHTML = '';
+function confirmHandover() {
+  const bal = getCashBalance();
+  if (bal <= 0) { showToast('⚠️ الخزنة فارغة', true); closeHandoverModal(); return; }
+  const note = get('hwNote').value.trim() || 'توريد يومي';
+  const hws = getHandovers();
+  hws.push({ id: Date.now(), amount: bal, date: new Date().toISOString(), note });
+  saveHandovers(hws);
+  setCashBalance(0);
+  closeHandoverModal();
+  calculateDashboard();
+  showToast(`✅ تم توريد ${bal.toLocaleString()} جنيه للمالك`);
+}
 
-            if (doctors.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3"><div class="empty-state"><div class="icon">🩺</div><p>لا يوجد أطباء مسجلون</p></div></td></tr>`;
-            } else {
-                doctors.forEach(doc => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><b>${doc.name}</b></td>
-                            <td>${doc.specialty}</td>
-                            <td><button class="btn-sm btn-danger" onclick="deleteDoctor(${doc.id})">🗑 حذف</button></td>
-                        </tr>`;
-                    select.innerHTML += `<option value="${doc.name}">${doc.name}</option>`;
-                });
-            }
-        }
+function openHandoverHistory() {
+  const hws = getHandovers().slice().reverse(); // newest first
+  const container = get('hwHistoryList');
+  if (!hws.length) {
+    container.innerHTML = '<div class="empty-state"><div class="ei">📋</div><p>لا توجد توريدات سابقة</p></div>';
+  } else {
+    const total = hws.reduce((s,h) => s+h.amount, 0);
+    container.innerHTML = hws.map(h => `
+      <div class="hw-row">
+        <div>
+          <div style="font-weight:bold;font-size:13px">${h.note}</div>
+          <div style="font-size:11px;color:var(--muted)">${new Date(h.date).toLocaleString('ar-EG')}</div>
+        </div>
+        <div style="color:#f59e0b;font-weight:bold">${h.amount.toLocaleString()} ج</div>
+      </div>`).join('') + `<div style="text-align:center;padding:14px 0;color:var(--muted);font-size:13px;border-top:1px solid var(--border);margin-top:8px">إجمالي التوريدات: <b style="color:#f59e0b">${total.toLocaleString()} جنيه</b></div>`;
+  }
+  get('hwHistoryModal').classList.add('active');
+}
 
-        function addDoctor() {
-            const name      = get('doctorNameInput').value.trim();
-            const specialty = get('doctorSpecialty').value.trim();
-            if (!name || !specialty) { showToast('⚠️ من فضلك أدخل الاسم والتخصص'); return; }
-            const doctors = getLS('clinic_doctors');
-            doctors.push({ id: Date.now(), name, specialty });
-            setLS('clinic_doctors', doctors);
-            get('doctorNameInput').value = '';
-            get('doctorSpecialty').value = '';
-            loadDoctors();
-            showToast(`✅ تم إضافة ${name} للطاقم الطبي`);
-        }
-
-        function deleteDoctor(id) {
-            if (!confirm('هل أنت متأكد من حذف هذا الطبيب؟')) return;
-            let doctors = getLS('clinic_doctors').filter(d => d.id !== id);
-            setLS('clinic_doctors', doctors);
-            loadDoctors();
-            showToast('🗑️ تم حذف الطبيب');
-        }
-
-        /* ══════════ الحجوزات ══════════ */
-        function loadAppointments() {
-            const apps  = getLS('clinic_appointments');
-            const tbody = get('appointmentsTable');
-            tbody.innerHTML = '';
-
-            if (apps.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">📋</div><p>لا توجد حجوزات اليوم</p></div></td></tr>`;
-                return;
-            }
-
-            apps.forEach(app => {
-                const isDone = app.status === 'done';
-                tbody.innerHTML += `
-                    <tr>
-                        <td><b>${app.name}</b><br><small style="color:var(--text-muted)">${app.phone || ''}</small></td>
-                        <td>${app.service}</td>
-                        <td>${app.doctor}</td>
-                        <td><b>${app.price}</b> جنيه</td>
-                        <td>
-                            <span class="badge ${isDone ? 'done' : 'waiting'}" onclick="toggleStatus(${app.id})">
-                                ${isDone ? '✅ تم الدفع' : '⏳ في الانتظار'}
-                            </span>
-                        </td>
-                        <td><button class="btn-sm btn-danger" onclick="deleteAppointment(${app.id})">🗑</button></td>
-                    </tr>`;
-            });
-        }
-
-        function addAppointment() {
-            const name    = get('patientName').value.trim();
-            const phone   = get('patientPhone').value.trim();
-            const selEl   = get('serviceType');
-            const service = selEl.value;
-            const price   = parseInt(selEl.options[selEl.selectedIndex].getAttribute('data-price'));
-            const doctor  = get('doctorSelect').value;
-
-            if (!name || !phone || !doctor) { showToast('⚠️ من فضلك أكمل بيانات الحجز'); return; }
-
-            const apps = getLS('clinic_appointments');
-            apps.push({ id: Date.now(), name, phone, service, doctor, price, status: 'waiting' });
-            setLS('clinic_appointments', apps);
-
-            get('patientName').value  = '';
-            get('patientPhone').value = '';
-            loadAppointments();
-            calculateDashboard();
-            showToast(`✅ تم حجز ${name} بنجاح`);
-        }
-
-        function toggleStatus(id) {
-            let apps = getLS('clinic_appointments').map(a => {
-                if (a.id === id) a.status = a.status === 'done' ? 'waiting' : 'done';
-                return a;
-            });
-            setLS('clinic_appointments', apps);
-            loadAppointments();
-            calculateDashboard();
-            showToast('✅ تم تحديث حالة الجلسة');
-        }
-
-        function deleteAppointment(id) {
-            if (!confirm('هل تريد حذف هذا الحجز؟')) return;
-            let apps = getLS('clinic_appointments').filter(a => a.id !== id);
-            setLS('clinic_appointments', apps);
-            loadAppointments();
-            calculateDashboard();
-            showToast('🗑️ تم حذف الحجز');
-        }
-
-        function clearAppointments() {
-            if (!confirm('هل أنت متأكد من تصفير بيانات اليوم كاملة؟')) return;
-            localStorage.removeItem('clinic_appointments');
-            loadAppointments();
-            calculateDashboard();
-            showToast('🔄 تم تصفير اليومية بنجاح');
-        }
-
-        /* ══════════ حسابات الداشبورد ══════════ */
-        function calculateDashboard() {
-            const apps    = getLS('clinic_appointments');
-            const doneApps  = apps.filter(a => a.status === 'done');
-            const waitApps  = apps.filter(a => a.status === 'waiting');
-            const revenue   = doneApps.reduce((s, a) => s + (a.price || 0), 0);
-            const expenses  = 450;
-            const netProfit = revenue - expenses;
-
-            get('todayRevenue').textContent = revenue.toLocaleString() + ' جنيه';
-            get('todayCases').textContent   = apps.length + ' حالة';
-            get('waitingCount').textContent = waitApps.length + ' في الانتظار';
-
-            const profitEl = get('netProfit');
-            if (netProfit >= 0) {
-                profitEl.style.color = 'var(--success-color)';
-                profitEl.textContent = '+ ' + netProfit.toLocaleString() + ' جنيه';
-            } else {
-                profitEl.style.color = 'var(--expense-color)';
-                profitEl.textContent = netProfit.toLocaleString() + ' جنيه';
-            }
-
-            initChart(revenue);
-        }
-
-        /* ══════════ الشارت ══════════ */
-        let currentChart;
-        function initChart(todayRevenue) {
-            const ctx = get('salesChart').getContext('2d');
-            Chart.defaults.color = '#a0a0b0';
-            Chart.defaults.font.family = "'Segoe UI', Tahoma, sans-serif";
-            if (currentChart) currentChart.destroy();
-
-            currentChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'],
-                    datasets: [{
-                        label: 'حركة الإيرادات اليومية (بالجنيه)',
-                        data: [2100, 3200, 1900, 4200, 2800, 3500, todayRevenue],
-                        backgroundColor: 'rgba(77, 208, 225, 0.07)',
-                        borderColor: '#4dd0e1',
-                        borderWidth: 2.5,
-                        tension: 0.4,
-                        fill: true,
-                        pointBackgroundColor: '#4dd0e1',
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    plugins: {
-                        legend: { labels: { color: '#a0a0b0', font: { size: 13 } } },
-                        tooltip: {
-                            backgroundColor: 'rgba(15,15,20,0.9)',
-                            borderColor: '#4dd0e1',
-                            borderWidth: 1,
-                            callbacks: {
-                                label: ctx => ` ${ctx.parsed.y.toLocaleString()} جنيه`
-                            }
-                        }
-                    },
-                    scales: {
-                        y: { 
-                            grid: { color: 'rgba(44,44,60,0.5)' },
-                            ticks: { callback: v => v.toLocaleString() }
-                        },
-                        x: { grid: { display: false } }
-                    }
-                }
-            });
-        }
-
-        /* ══════════ التشغيل عند الفتح ══════════ */
-        document.addEventListener('DOMContentLoaded', () => {
-            initData();
-            loadDoctors();
-            loadAppointments();
-            calculateDashboard();
-        });
-    </script>
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('active');
+  });
+});
+</script>
 </body>
 </html>
