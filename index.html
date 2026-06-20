@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MADA Physio Clinic — Smart System</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body[data-theme="dark"]{--ov:rgba(8,12,10,.79);--card:rgba(20,20,28,.93);--nav:rgba(14,18,16,.96);--txt:#fff;--muted:#9090a8;--bdr:rgba(44,44,60,.8);--hdr:#fff;--htxt:#111;--inp:#16161f;--ibdr:#2c2c3e;}
@@ -648,10 +650,133 @@ tr:hover td{background:rgba(255,255,255,.02);}
 </div>
 <div class="toast" id="tst2"></div>
 <script>
+/* ══════════════════════════════════════════════
+   🔥 FIREBASE REAL-TIME SYNC
+   الخطوات (مرة واحدة فقط):
+   1. افتح https://console.firebase.google.com
+   2. أنشئ مشروع جديد → اضغط "Continue"
+   3. من القائمة: Build → Realtime Database → Create database
+      اختار "Start in test mode" → Enable
+   4. من الأيقونة ⚙️ → Project settings → Your apps → Web (</>)
+      سجل الـ app، انسخ الـ config والصقه هنا:
+════════════════════════════════════════════════ */
+const FB_CFG = {
+  apiKey:            "AIzaSyAlit7xJEUOX9tefgax1Tx8wscXSFiTiDw",
+  authDomain:        "mada-clinic-fa740.firebaseapp.com",
+  databaseURL:       "https://mada-clinic-fa740-default-rtdb.firebaseio.com",
+  projectId:         "mada-clinic-fa740",
+  storageBucket:     "mada-clinic-fa740.firebasestorage.app",
+  messagingSenderId: "815724587320",
+  appId:             "1:815724587320:web:b7ea119b256042b534f9cd"
+};
+let _db = null;
+const FB_ON = () => _db !== null;
+
+function initFB() {
+  if (!FB_CFG.apiKey || !FB_CFG.databaseURL) {
+    console.log('Firebase not configured — using localStorage only');
+    return;
+  }
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(FB_CFG);
+    _db = firebase.database();
+    console.log('✅ Firebase connected — real-time sync active');
+  } catch(e) { console.warn('Firebase init failed:', e.message); }
+}
+
+/* map localStorage key → Firebase path */
+function fbPath(key) {
+  if (key.startsWith('ma_ap_'))  return 'appointments/' + key.slice(6);
+  if (key.startsWith('ma_ex_'))  return 'expenses/'     + key.slice(6);
+  const m = {
+    'ma_pts':'patients','ma_staff':'staff','ma_svcs':'services',
+    'ma_usrs':'users','ma_hws':'handovers','ma_nf':'notifications',
+    'ma_del':'deleted','ma_psc':'patientSeq'
+  };
+  return m[key] || null;
+}
+
+/* write to both localStorage AND Firebase */
+function fbSet(key, val) {
+  if (!FB_ON()) return;
+  const p = fbPath(key);
+  if (p) _db.ref('mada/' + p).set(val).catch(() => {});
+}
+
+/* listen and update localStorage + re-render */
+function fbListen(fbPath2, lsKey, onUpdate) {
+  if (!FB_ON()) return;
+  _db.ref('mada/' + fbPath2).on('value', snap => {
+    if (!snap.exists()) return;
+    const v = snap.val();
+    if (lsKey) localStorage.setItem(lsKey, typeof v === 'string' || typeof v === 'number' ? v : JSON.stringify(v));
+    if (onUpdate) onUpdate(v);
+  });
+}
+
+function setupFBListeners() {
+  if (!FB_ON()) return;
+  const today = tds();
+  fbListen('users',            'ma_usrs',        ()=>{ if(document.getElementById('uT')) ldUsrs(); });
+  fbListen('patients',         'ma_pts',          ()=>{ rndPL(); if(CPI) opPP(CPI); });
+  fbListen('staff',            'ma_staff',        ()=>{ ldSSels(); if(document.getElementById('stT')?.closest('.tbc.on')) ldSt(); });
+  fbListen('services',         'ma_svcs',         ()=>{ ldSSels2(); });
+  fbListen('handovers',        'ma_hws',          ()=>{ calcDb(); });
+  fbListen('notifications',    'ma_nf',           ()=>{ rndNf(); });
+  fbListen('deleted',          'ma_del',          ()=>{ if(document.getElementById('DL')?.closest('.tbc.on')) ldDL(); });
+  fbListen('cash',             'ma_cash',         v =>{ localStorage.setItem('ma_cash', v); calcDb(); });
+  fbListen('appointments/'+today, ak(today),      ()=>{ ldAps(); calcDb(); });
+  // expenses current month
+  fbListen('expenses/'+mns(), ek(mns()),          ()=>{ ldExps(); calcDb(); });
+}
+
+/* pull fresh data from Firebase before login check */
+async function fbPullUsers() {
+  if (!FB_ON()) return;
+  try {
+    const snap = await _db.ref('mada/users').get();
+    if (snap.exists()) {
+      localStorage.setItem('ma_usrs', JSON.stringify(snap.val()));
+    }
+  } catch(e) {}
+}
+
+/* seed default data to Firebase if it's empty */
+async function fbSeedIfEmpty() {
+  if (!FB_ON()) return;
+  try {
+    const snap = await _db.ref('mada/users').get();
+    if (!snap.exists()) {
+      // Firebase is empty — push current localStorage data
+      ['ma_usrs','ma_staff','ma_svcs'].forEach(k => {
+        const v = localStorage.getItem(k);
+        if (v) {
+          const p = fbPath(k);
+          if (p) _db.ref('mada/'+p).set(JSON.parse(v)).catch(()=>{});
+        }
+      });
+    } else {
+      // Firebase has data — pull it to localStorage
+      ['users','staff','services','patients','handovers','notifications','deleted'].forEach(async p => {
+        const s = await _db.ref('mada/'+p).get();
+        if (s.exists()) {
+          const lsKeyMap = {users:'ma_usrs',staff:'ma_staff',services:'ma_svcs',patients:'ma_pts',handovers:'ma_hws',notifications:'ma_nf',deleted:'ma_del'};
+          if (lsKeyMap[p]) localStorage.setItem(lsKeyMap[p], JSON.stringify(s.val()));
+        }
+      });
+      const cashSnap = await _db.ref('mada/cash').get();
+      if (cashSnap.exists()) localStorage.setItem('ma_cash', cashSnap.val());
+      const seqSnap = await _db.ref('mada/patientSeq').get();
+      if (seqSnap.exists()) localStorage.setItem('ma_psc', seqSnap.val());
+    }
+  } catch(e) { console.warn('fbSeedIfEmpty error:', e.message); }
+}
+
+
 /* UTILS */
 const g=id=>document.getElementById(id);
 const gL=k=>{try{return JSON.parse(localStorage.getItem(k))||[];}catch{return [];}};
-const sL=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const sL=(k,v)=>{localStorage.setItem(k,JSON.stringify(v));fbSet(k,v);};
 const gO=k=>{try{return JSON.parse(localStorage.getItem(k))||{};}catch{return {};}};
 function tds(){return new Date().toISOString().split('T')[0];}
 function mns(){return tds().slice(0,7);}
@@ -672,7 +797,7 @@ const sUs=u=>sL('ma_usrs',u);
 const gHW=()=>gL('ma_hws');
 const sHW=h=>sL('ma_hws',h);
 const gCsh=()=>parseFloat(localStorage.getItem('ma_cash')||'0');
-const sCsh=v=>localStorage.setItem('ma_cash',v);
+const sCsh=v=>{localStorage.setItem('ma_cash',v);if(FB_ON())_db.ref('mada/cash').set(v).catch(()=>{});};
 const aCsh=v=>sCsh(gCsh()+v);
 const gDL=()=>gL('ma_del');
 const sDL=d=>sL('ma_del',d);
@@ -727,9 +852,10 @@ function gExR(){const a=[];getDays().forEach(d=>{const m=d.slice(0,7);gEx(m).fil
 
 /* AUTH */
 let CU=null;
-function doLogin(){
+async function doLogin(){
   const u=g('lu').value.trim(),p=g('lp').value;
   if(!u||!p){shLE('أدخل اسم المستخدم وكلمة المرور');return;}
+  await fbPullUsers(); // pull latest users from Firebase before checking
   const usr=gUs().find(x=>x.un===u&&x.pw===p&&x.act!==false);
   if(!usr){shLE('اسم المستخدم أو كلمة المرور غلط');return;}
   CU=usr;sL('ma_sess',{...usr,lt:new Date().toISOString()});
@@ -855,7 +981,7 @@ function vphn(el){const v=el.value.replace(/\D/g,'');if(v.length>0&&v.length<11)
 
 /* PATIENTS */
 let CPI=null;
-function nxtPID(){const n=(parseInt(localStorage.getItem('ma_psc')||'0')+1);localStorage.setItem('ma_psc',n);return 'م-'+String(n).padStart(4,'0');}
+function nxtPID(){const n=(parseInt(localStorage.getItem('ma_psc')||'0')+1);localStorage.setItem('ma_psc',n);if(FB_ON())_db.ref('mada/patientSeq').set(n).catch(()=>{});return 'م-'+String(n).padStart(4,'0');}
 function opNPF(){g('pLV').style.display='none';g('pPV').style.display='none';g('pNF').style.display='block';}
 function clNPF(){g('pNF').style.display='none';g('pLV').style.display='block';}
 function svNP(){
@@ -1183,17 +1309,31 @@ function initData(){
   if(!localStorage.getItem('ma_svcs'))sSv(DSTF);
 }
 function initApp(){
-  applyRC();calcDb();ldAps();ldExps();ldSt();ldSSels();ldSSels2();rndPL();rndNf();
+  applyRC();
+  setupFBListeners();calcDb();ldAps();ldExps();ldSt();ldSSels();ldSSels2();rndPL();rndNf();
   const th=localStorage.getItem('ma_th')||'dark';
   document.body.setAttribute('data-theme',th);
   document.querySelectorAll('.thbt').forEach(b=>b.classList.toggle('on',b.classList.contains('th'+th.charAt(0))));
 }
-document.addEventListener('DOMContentLoaded',()=>{
+document.addEventListener('DOMContentLoaded',async ()=>{
+  initFB();
   initData();
+  await fbSeedIfEmpty();
   const sess=gO('ma_sess');
   if(sess?.un){const u=gUs().find(x=>x.un===sess.un&&x.act!==false);if(u){CU=u;g('LS').style.display='none';g('MA').style.display='block';initApp();return;}}
   g('LS').style.display='flex';
 });
+
+/* auto-refresh Firebase listener when date changes at midnight */
+setInterval(()=>{
+  const newDay = tds();
+  if (window._lastDay && window._lastDay !== newDay && FB_ON()) {
+    _db.ref('mada/appointments/'+newDay).on('value', snap=>{
+      if(snap.exists()){localStorage.setItem(ak(newDay),JSON.stringify(snap.val()));ldAps();calcDb();}
+    });
+  }
+  window._lastDay = newDay;
+}, 60000);
 </script>
 </body>
 </html>
