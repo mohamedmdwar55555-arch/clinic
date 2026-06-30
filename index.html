@@ -18,12 +18,13 @@ body[data-theme="light"]{--ov:rgba(100,210,220,.55);--card:rgba(245,253,254,.95)
 :root{--green:#0a4d34;--green2:#0e6344;--blue:#4dd0e1;--ok:#00c853;--bad:#ff1744;--warn:#ffc107;}
 body{font-family:'Segoe UI',Tahoma,sans-serif;padding:16px;min-height:100vh;color:var(--txt);background-image:url('علاج_طبيعي.png');background-repeat:repeat;background-attachment:fixed;background-color:#080d0b;}
 body::before{content:"";position:fixed;inset:0;background:var(--ov);z-index:0;}
-body>*{position:relative;z-index:1;}
+body>*:not(#loginScreen){position:relative;z-index:1;}
+#loginScreen::before{content:"";position:absolute;inset:0;background:rgba(4,14,10,.87);z-index:0;}
 
 /* LOGIN */
-#loginScreen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background-image:url('علاج_طبيعي.png');background-color:#060e0c;}
+#loginScreen{position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;z-index:99999;background-image:url('علاج_طبيعي.png');background-size:auto;background-color:#060e0c;overflow:auto;display:flex;align-items:center;justify-content:center;}
 #loginScreen::before{content:"";position:absolute;inset:0;background:rgba(4,14,10,.86);z-index:0;}
-.lcard{position:relative;z-index:1;width:90%;max-width:420px;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+.lcard{position:relative;z-index:3;width:90%;max-width:420px;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6);}
 .ltop{background:linear-gradient(145deg,#0a4d34,#0e6344 60%,#1a7a55);padding:36px 32px 28px;text-align:center;}
 .lpill{display:inline-flex;align-items:center;justify-content:center;background:#fff;border-radius:14px;padding:10px 18px;margin-bottom:14px;box-shadow:0 4px 20px rgba(0,0,0,.3);}
 .lpill img{height:44px;width:auto;}
@@ -245,6 +246,34 @@ tr:hover td{background:rgba(255,255,255,.02);}
 .empty .ei{font-size:32px;margin-bottom:7px;}
 .empty p{font-size:12px;}
 .rpbox{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:18px;min-height:180px;white-space:pre-wrap;font-size:13px;line-height:1.8;color:var(--txt);backdrop-filter:blur(8px);}
+
+/* SKELETON */
+.sr{fill:rgba(77,208,225,.12);stroke:rgba(77,208,225,.5);stroke-width:1.5;transition:.3s;cursor:pointer;}
+.sr:hover{fill:rgba(77,208,225,.25);}
+.sr.pain{fill:rgba(255,23,68,.35);stroke:#ff1744;stroke-width:2;animation:pulse 1.5s ease-in-out infinite;}
+.sr.ref{fill:rgba(255,152,0,.3);stroke:#ff9800;stroke-width:1.5;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+.slbl{font-size:9px;fill:var(--muted);font-family:'Segoe UI',sans-serif;}
+/* TRANSFER ITEM */
+.tritem{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:14px;margin-bottom:10px;}
+.tritem.rejected{background:rgba(255,23,68,.06);border-color:rgba(255,23,68,.3);}
+.tritem.confirmed{background:rgba(0,200,83,.06);border-color:rgba(0,200,83,.3);}
+/* SALARY */
+.sal-card{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:14px;}
+.sal-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--blue));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+/* DOCTOR VIEW */
+.dv-stat{background:rgba(0,0,0,.15);border:1px solid var(--bdr);border-radius:8px;padding:10px 14px;margin-bottom:8px;}
+.dv-label{font-size:10px;color:var(--muted);font-weight:700;margin-bottom:3px;}
+.dv-value{font-size:14px;color:var(--txt);font-weight:600;}
+.wq-item{background:var(--card);border:1px solid var(--bdr);border-radius:8px;padding:10px 13px;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+/* PDF PRINT */
+@media print{
+  body>*:not(#printArea){display:none!important;}
+  #printArea{display:block!important;position:static;}
+  .no-print{display:none!important;}
+}
+#printArea{display:none;}
+
 @media(max-width:600px){.hdr{flex-direction:column;text-align:center;}.hright{justify-content:center;}.cgrid{grid-template-columns:1fr 1fr;}.fr,.fr3{grid-template-columns:1fr;}.dl{flex-direction:column;}.tsec{min-width:unset;}}
 </style>
 </head>
@@ -261,7 +290,7 @@ tr:hover td{background:rgba(255,255,255,.02);}
       <h3>تسجيل الدخول</h3>
       <div class="lfield"><label>اسم المستخدم</label><input type="text" id="lu" placeholder="username" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <div class="lfield"><label>كلمة المرور</label><input type="password" id="lp" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-      <button class="lbtn" onclick="doLogin()">تسجيل الدخول</button>
+      <button class="lbtn" id="lbtn" onclick="doLogin()">تسجيل الدخول</button>
       <div class="lerr" id="le">اسم المستخدم أو كلمة المرور غلط</div>
     </div>
     <div class="lfooter">© 2026 MADA Physio Clinic</div>
@@ -323,6 +352,10 @@ tr:hover td{background:rgba(255,255,255,.02);}
   <button class="tabbtn" data-tab="trp" data-roles="مدير" onclick="swTab(this)"><span>📝</span>Reports</button>
   <button class="tabbtn" data-tab="tu" data-roles="مدير" onclick="swTab(this)"><span>👤</span>Users</button>
   <button class="tabbtn" data-tab="tdl" data-roles="مدير" onclick="swTab(this)"><span>🗑️</span>Audit</button>
+  <button class="tabbtn" data-tab="ttr" data-roles="مدير" onclick="swTab(this)"><span>📤</span>Transfers</button>
+  <button class="tabbtn" data-tab="tdoc" data-roles="all" onclick="swTab(this)"><span>🩺</span>Doctor View</button>
+  <button class="tabbtn" data-tab="tsal" data-roles="مدير" onclick="swTab(this)"><span>💰</span>Salaries</button>
+  <button class="tabbtn" data-tab="tjrn" data-roles="مدير,سكرتارية,محاسب" onclick="swTab(this)"><span>📒</span>Journal</button>
 </div>
 
 <!-- DASHBOARD TAB -->
@@ -340,6 +373,10 @@ tr:hover td{background:rgba(255,255,255,.02);}
     <div class="safe-acts">
       <button class="bamb" onclick="opHW()">📤 Transfer to Owner</button>
       <button class="bout" onclick="opHWH()">📋 Handover Log</button>
+      <button class="btn" style="width:auto;padding:8px 14px;background:#6366f1" onclick="opShiftClose()">🔒 إغلاق الشفت</button>
+    </div>
+    <div id="shiftWarn" style="display:none;margin-top:8px;padding:8px 12px;background:rgba(255,193,7,.1);border:1px solid var(--warn);border-radius:8px;font-size:12px;color:var(--warn)">
+      ⚠️ اليوم النشط: <b id="activeDayLabel"></b> — الشفت لسه مش مقفول
     </div>
   </div>
   <div class="chc"><canvas id="SC"></canvas></div>
@@ -460,24 +497,36 @@ tr:hover td{background:rgba(255,255,255,.02);}
   </div>
 </div>
 
-<!-- APPOINTMENTS TAB -->
+<!-- APPOINTMENTS TAB — READ-ONLY MONITOR -->
 <div id="ta" class="tbc">
-  <div class="dl">
-    <div class="fsec">
-      <div class="shdr"><h3>New Appointment</h3></div>
-      <div class="fg"><label>Patient Name</label><input type="text" id="aN" placeholder="الاسم"></div>
-      <div class="fg"><label>Phone (quick lookup)</label><input type="tel" id="aPh" placeholder="01XXXXXXXXX" oninput="lkPat(this.value)"></div>
-      <div id="plr" style="display:none;font-size:11px;color:var(--blue);margin:-7px 0 7px;padding:5px 9px;background:rgba(77,208,225,.06);border-radius:6px;border:1px solid rgba(77,208,225,.2)"></div>
-      <div class="fg"><label>Service</label><select id="aS"></select></div>
-      <div class="fg"><label>Doctor</label><select id="aD"></select></div>
-      <button class="btn" onclick="addApp()">✅ Confirm Booking</button>
+  <!-- Search + filter bar -->
+  <div class="full" style="margin-bottom:14px">
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <input type="text" id="aptSearch" placeholder="🔍 بحث بالاسم أو الكود أو التليفون..." 
+        style="flex:1;min-width:200px;padding:9px 13px;border:1px solid var(--bdr);border-radius:9px;background:var(--inp);color:var(--txt);font-size:13px;font-family:inherit"
+        oninput="ldAps()">
+      <input type="date" id="aptDatePick" 
+        style="padding:8px 10px;border:1px solid var(--ibdr);border-radius:8px;background:var(--inp);color:var(--txt);font-size:13px;font-family:inherit;color-scheme:dark"
+        onchange="filterAptByDate()">
+      <button class="dftd" onclick="resetAptDate()">📅 اليوم</button>
+      <span style="font-size:11px;color:#8b5cf6;cursor:pointer;padding:5px 11px;border-radius:6px;border:1px solid rgba(139,92,246,.3)" onclick="shDiscRpt()">🏷️ خصومات الشفت</span>
+      <button class="btn" style="width:auto;padding:8px 16px;background:#6366f1" onclick="swToPatients()">➕ حجز جديد ← Patients</button>
     </div>
-    <div class="tsec">
-      <div class="shdr">
-        <h3>Today's Appointments 📋</h3>
-        <span style="font-size:11px;color:#8b5cf6;cursor:pointer;padding:4px 9px;border-radius:6px;border:1px solid rgba(139,92,246,.3)" onclick="shDiscRpt()">🏷️ خصومات الشفت</span>
-      </div>
-      <table><thead><tr><th>Patient</th><th>Service</th><th>Doctor</th><th>Amount</th><th>Pay</th><th>Status</th><th></th></tr></thead><tbody id="aT"></tbody></table>
+  </div>
+  <!-- Status legend -->
+  <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+    <span style="font-size:12px;display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;background:#f59e0b;display:inline-block"></span> محجوز — لم يُدفع</span>
+    <span style="font-size:12px;display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;background:#06b6d4;display:inline-block"></span> مع الدكتور</span>
+    <span style="font-size:12px;display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;background:#00c853;display:inline-block"></span> تم الدفع والانتهاء</span>
+  </div>
+  <div class="full" style="padding:0;overflow:hidden">
+    <div id="aptCards"></div>
+    <div id="aptTableWrap" style="overflow-x:auto">
+      <table><thead><tr>
+        <th style="width:14px"></th>
+        <th>المريض</th><th>الخدمة</th><th>الدكتور</th>
+        <th>المبلغ</th><th>وسيلة الدفع</th><th>الحالة</th><th>الوقت</th><th></th>
+      </tr></thead><tbody id="aT"></tbody></table>
     </div>
   </div>
 </div>
@@ -497,11 +546,18 @@ tr:hover td{background:rgba(255,255,255,.02);}
       </select></div>
       <div class="fg"><label>Description</label><textarea id="eD" placeholder="تفاصيل..."></textarea></div>
       <div class="fg"><label>Amount (EGP)</label><input type="number" id="eA" placeholder="0" min="1"></div>
+      <div class="fg"><label>ادفع من حساب</label>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <label class="radi"><input type="radio" name="epm" value="cash" checked> 💵 كاش</label>
+          <label class="radi"><input type="radio" name="epm" value="instapay"> 📱 انستا</label>
+          <label class="radi"><input type="radio" name="epm" value="wallet"> 🏦 محفظة</label>
+        </div>
+      </div>
       <button class="btn" onclick="addExp()">💾 Save</button>
     </div>
     <div class="tsec">
       <div class="shdr"><h3>Expenses</h3></div>
-      <table><thead><tr><th>Category</th><th>Description</th><th>Amount</th><th>By</th><th></th></tr></thead><tbody id="eT2"></tbody></table>
+      <table><thead><tr><th>Category</th><th>Description</th><th>Amount</th><th>حساب</th><th>By</th><th></th></tr></thead><tbody id="eT2"></tbody></table>
     </div>
   </div>
 </div>
@@ -511,13 +567,21 @@ tr:hover td{background:rgba(255,255,255,.02);}
   <div class="dl">
     <div class="fsec">
       <div class="shdr"><h3>Add Staff</h3></div>
-      <div class="fg"><label>Name</label><input type="text" id="stN" placeholder="د. الاسم"></div>
-      <div class="fg"><label>Specialty</label><input type="text" id="stSp" placeholder="تخصص"></div>
+      <div class="fg"><label>الاسم الكامل</label><input type="text" id="stN" placeholder="د. الاسم الكامل"></div>
+      <div class="fg"><label>نوع الوظيفة *</label>
+        <select id="stJob">
+          <option value="دكتور">🩺 دكتور</option>
+          <option value="سكرتارية">💼 سكرتارية</option>
+          <option value="محاسب">📊 محاسب</option>
+          <option value="أوفيس بوي">🧹 أوفيس بوي</option>
+        </select>
+      </div>
+      <div class="fg"><label>التخصص</label><input type="text" id="stSp" placeholder="مثال: علاج طبيعي وتأهيل"></div>
       <button class="btn" onclick="addSt()">➕ Add</button>
     </div>
     <div class="tsec">
       <div class="shdr"><h3>Medical Team 🩺</h3></div>
-      <table><thead><tr><th>Name</th><th>Specialty</th><th></th></tr></thead><tbody id="stT"></tbody></table>
+      <table><thead><tr><th>الاسم</th><th>الوظيفة</th><th>التخصص</th><th></th></tr></thead><tbody id="stT"></tbody></table>
     </div>
   </div>
 </div>
@@ -527,7 +591,7 @@ tr:hover td{background:rgba(255,255,255,.02);}
   <div class="full" style="margin-bottom:12px">
     <div style="font-size:12px;font-weight:700;color:var(--txt);margin-bottom:9px">📋 كشف حساب مفصل</div>
     <div class="stfg">
-      <div class="fg"><label>نوع الكشف</label><select id="stT2" onchange="updSD()"><option value="all">الكل</option><option value="patient">مريض</option><option value="doctor">دكتور</option><option value="payment">وسيلة دفع</option><option value="expense">مصروف</option></select></div>
+      <div class="fg"><label>نوع الكشف</label><select id="stT2" onchange="updSD()"><option value="all">الكل</option><option value="patient">مريض</option><option value="doctor">دكتور</option><option value="payment">وسيلة دفع</option><option value="expense">مصروف</option><option value="balance">رصيد الحسابات</option></select></div>
       <div class="fg"><label>تفاصيل</label><select id="stD"></select></div>
       <div class="fg"><label>من</label><input type="date" id="stF"></div>
       <div class="fg"><label>إلى</label><input type="date" id="stTo"></div>
@@ -545,6 +609,7 @@ tr:hover td{background:rgba(255,255,255,.02);}
       <div class="fg"><label>Service Name</label><input type="text" id="svN" placeholder="اسم الخدمة"></div>
       <div class="fg"><label>Price (EGP)</label><input type="number" id="svP" placeholder="0"></div>
       <div class="fg"><label>Category</label><select id="svC"><option value="كشوفات">كشوفات</option><option value="جلسات">جلسات</option><option value="باكجات">باكجات</option><option value="أخرى">أخرى</option></select></div>
+      <div class="fg"><label>سعر التأمين (ج) — اختياري</label><input type="number" id="svInsP" placeholder="0" min="0"></div>
       <button class="btn" onclick="svSvc()">💾 Save</button>
       <input type="hidden" id="svEid">
     </div>
@@ -600,6 +665,202 @@ tr:hover td{background:rgba(255,255,255,.02);}
 <!-- AUDIT LOG TAB -->
 <div id="tdl" class="tbc">
   <div class="full"><div class="shdr"><h3>🗑️ Deleted Records Log</h3><span style="font-size:11px;color:var(--muted)">قابل للاستعادة</span></div><div id="DL"></div></div>
+</div>
+
+
+<!-- TRANSFERS TAB -->
+<div id="ttr" class="tbc">
+  <div class="full">
+    <div class="shdr"><h3>📤 طلبات التوريد — تأكيد المدير</h3></div>
+    <div id="trList"></div>
+  </div>
+</div>
+
+<!-- DOCTOR VIEW TAB -->
+<div id="tdoc" class="tbc">
+  <div class="dl">
+    <!-- Left: Skeleton -->
+    <div class="fsec" style="min-width:300px;max-width:340px">
+      <div class="shdr">
+        <h3>🦴 خريطة الألم</h3>
+        <div style="display:flex;gap:5px">
+          <button class="bbl" style="font-size:10px;padding:3px 8px" onclick="skelView('front',this)">أمام</button>
+          <button class="bbl" style="font-size:10px;padding:3px 8px" onclick="skelView('back',this)">خلف</button>
+          <button class="bbl" style="font-size:10px;padding:3px 8px" onclick="skelView('side',this)">جانب</button>
+        </div>
+      </div>
+      <div id="skelWrap" style="text-align:center;user-select:none">
+        <svg id="skelSVG" viewBox="0 0 200 500" style="width:100%;max-width:260px;cursor:pointer">
+          <!-- HEAD -->
+          <ellipse class="sr" data-r="head" cx="100" cy="40" rx="30" ry="36"/>
+          <!-- NECK -->
+          <rect class="sr" data-r="neck" x="88" y="74" width="24" height="20" rx="5"/>
+          <!-- SHOULDERS -->
+          <ellipse class="sr" data-r="shoulder" cx="52" cy="105" rx="24" ry="14"/>
+          <ellipse class="sr" data-r="shoulder" cx="148" cy="105" rx="24" ry="14"/>
+          <!-- CHEST/TORSO -->
+          <path class="sr" data-r="chest" d="M68,92 L132,92 L138,200 L62,200 Z"/>
+          <!-- UPPER ARMS -->
+          <rect class="sr" data-r="arm" x="30" y="112" width="20" height="60" rx="9"/>
+          <rect class="sr" data-r="arm" x="150" y="112" width="20" height="60" rx="9"/>
+          <!-- ELBOWS -->
+          <ellipse class="sr" data-r="elbow" cx="40" cy="178" rx="13" ry="11"/>
+          <ellipse class="sr" data-r="elbow" cx="160" cy="178" rx="13" ry="11"/>
+          <!-- FOREARMS -->
+          <rect class="sr" data-r="forearm" x="33" y="187" width="16" height="52" rx="7"/>
+          <rect class="sr" data-r="forearm" x="151" y="187" width="16" height="52" rx="7"/>
+          <!-- WRISTS/HANDS -->
+          <ellipse class="sr" data-r="wrist" cx="41" cy="252" rx="16" ry="14"/>
+          <ellipse class="sr" data-r="wrist" cx="159" cy="252" rx="16" ry="14"/>
+          <!-- PELVIS -->
+          <path class="sr" data-r="pelvis" d="M62,200 L138,200 L148,248 L52,248 Z"/>
+          <!-- HIPS -->
+          <ellipse class="sr" data-r="hip" cx="62" cy="256" rx="22" ry="15"/>
+          <ellipse class="sr" data-r="hip" cx="138" cy="256" rx="22" ry="15"/>
+          <!-- THIGHS -->
+          <rect class="sr" data-r="thigh" x="68" y="267" width="28" height="72" rx="12"/>
+          <rect class="sr" data-r="thigh" x="104" y="267" width="28" height="72" rx="12"/>
+          <!-- KNEES -->
+          <ellipse class="sr" data-r="knee" cx="82" cy="346" rx="20" ry="15"/>
+          <ellipse class="sr" data-r="knee" cx="118" cy="346" rx="20" ry="15"/>
+          <!-- LOWER LEGS -->
+          <rect class="sr" data-r="leg" x="72" y="359" width="20" height="68" rx="9"/>
+          <rect class="sr" data-r="leg" x="108" y="359" width="20" height="68" rx="9"/>
+          <!-- ANKLES -->
+          <ellipse class="sr" data-r="ankle" cx="82" cy="433" rx="17" ry="12"/>
+          <ellipse class="sr" data-r="ankle" cx="118" cy="433" rx="17" ry="12"/>
+          <!-- FEET -->
+          <ellipse class="sr" data-r="foot" cx="80" cy="452" rx="22" ry="9"/>
+          <ellipse class="sr" data-r="foot" cx="120" cy="452" rx="22" ry="9"/>
+          <!-- SPINE LINE (decorative) -->
+          <line x1="100" y1="94" x2="100" y2="200" stroke="rgba(77,208,225,.3)" stroke-width="2" stroke-dasharray="4"/>
+          <!-- REGION LABELS -->
+          <text x="140" y="42" class="slbl">رأس</text>
+          <text x="140" y="100" class="slbl">كتف</text>
+          <text x="140" y="155" class="slbl">صدر</text>
+          <text x="140" y="225" class="slbl">حوض</text>
+          <text x="140" y="310" class="slbl">فخذ</text>
+          <text x="140" y="350" class="slbl">ركبة</text>
+          <text x="140" y="395" class="slbl">ساق</text>
+          <text x="140" y="450" class="slbl">قدم</text>
+          <text x="7" y="135" class="slbl">ذراع</text>
+          <text x="7" y="210" class="slbl">يد</text>
+        </svg>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px">🔴 منطقة الألم — اضغط على أي منطقة لتحديدها</div><div id="painTermsLabel" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;min-height:24px"><span style="color:var(--muted);font-size:12px">لا توجد مناطق محددة</span></div>
+      </div>
+    </div>
+    <!-- Right: Patient info -->
+    <div class="tsec" style="flex:1">
+      <div class="shdr">
+        <h3>📋 الحالة الحالية</h3>
+        <select id="docPatSel" onchange="loadDocView()" style="padding:6px 10px;border:1px solid var(--ibdr);border-radius:8px;background:var(--inp);color:var(--txt);font-size:12px;font-family:inherit">
+          <option value="">— اختار حالة —</option>
+        </select>
+      </div>
+      <div id="docPatInfo">
+        <div class="empty"><div class="ei">👨‍⚕️</div><p>اختار حالة من القائمة أعلاه</p></div>
+      </div>
+      <!-- Waiting queue -->
+      <div style="margin-top:14px">
+        <div class="shdr"><h3>⏳ قائمة الانتظار</h3></div>
+        <div id="waitingQueue"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SALARIES TAB -->
+<div id="tsal" class="tbc">
+  <div class="dl">
+    <div class="fsec">
+      <div class="shdr"><h3>إعداد مرتب موظف</h3></div>
+      <div class="fg"><label>الموظف</label><select id="salEmpSel" onchange="loadSalEmp()"></select></div>
+      <div class="fg"><label>المرتب الأساسي (ج)</label><input type="number" id="salBase" placeholder="0"></div>
+      <div id="salDocFields" style="display:none">
+        <div class="fg"><label>نظام الأجر</label>
+          <div class="radg">
+            <label class="radi"><input type="radio" name="salType" value="fixed" checked> ثابت</label>
+            <label class="radi"><input type="radio" name="salType" value="pct"> نسبة</label>
+          </div>
+        </div>
+        <div id="salPctFields" style="display:none">
+          <div class="fr">
+            <div class="fg"><label>نسبة الكشف %</label><input type="number" id="salConsultPct" placeholder="0" min="0" max="100"></div>
+            <div class="fg"><label>نسبة الجلسة %</label><input type="number" id="salSessionPct" placeholder="0" min="0" max="100"></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn" onclick="svSalary()">💾 حفظ</button>
+    </div>
+    <div class="tsec">
+      <div class="shdr"><h3>💰 ملخص المرتبات</h3>
+        <input type="month" id="salMonth" style="padding:5px 9px;border:1px solid var(--ibdr);border-radius:7px;background:var(--inp);color:var(--txt);font-family:inherit;font-size:12px" onchange="rndSalaries()">
+      </div>
+      <div id="salTable"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SHIFT CLOSE MODAL -->
+<div class="mo" id="shiftMo">
+  <div class="md" style="max-width:400px">
+    <h3>🔒 إغلاق الشفت ونقل اليوم</h3>
+    <div class="mdinf">
+      <div class="mi"><span>اليوم النشط:</span><b id="shiftCurDay" style="color:var(--warn)"></b></div>
+      <div class="mi"><span>رصيد الكاش:</span><b id="shiftCurCash" style="color:#f59e0b"></b></div>
+      <div class="mi"><span>اليوم الجديد:</span><b id="shiftNewDay" style="color:var(--ok)"></b></div>
+    </div>
+    <div id="shiftBlockMsg" style="display:none;padding:10px;background:rgba(255,23,68,.1);border:1px solid var(--bad);border-radius:8px;font-size:12px;color:#ff6b6b;margin-bottom:12px">
+      ⛔ لا يمكن إغلاق الشفت — يوجد رصيد كاش مع السكرتارية. يجب توريد الكاش أولاً أو صرفه.
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">سيتم نقل الرصيد المتبقي لليوم الجديد وإغلاق بيانات اليوم الحالي.</p>
+    <div class="mdf">
+      <button class="bok btn" id="shiftConfBtn" onclick="cnfShiftClose()">✅ إغلاق وفتح يوم جديد</button>
+      <button class="bout" style="flex:1" onclick="g('shiftMo').classList.remove('on')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- JOURNAL ENTRIES TAB -->
+<div id="tjrn" class="tbc">
+  <div class="dl">
+    <div class="fsec">
+      <div class="shdr"><h3>📒 قيد محاسبي جديد</h3></div>
+      <div class="fg">
+        <label>من حساب (مدين / Debit)</label>
+        <select id="jrnFrom">
+          <option value="cash">💵 كاش</option>
+          <option value="instapay">📱 انستاباي</option>
+          <option value="wallet">🏦 محفظة إلكترونية</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>إلى حساب (دائن / Credit)</label>
+        <select id="jrnTo">
+          <option value="expenses_medical">💊 مستلزمات طبية</option>
+          <option value="expenses_equipment">🔧 أجهزة وصيانة</option>
+          <option value="expenses_rent">🏢 إيجار</option>
+          <option value="expenses_salary">👤 مرتبات</option>
+          <option value="cash">💵 كاش</option>
+          <option value="instapay">📱 انستاباي</option>
+          <option value="wallet">🏦 محفظة</option>
+          <option value="other">📦 أخرى</option>
+        </select>
+      </div>
+      <div class="fg"><label>المبلغ (ج)</label><input type="number" id="jrnAmt" placeholder="0" min="1"></div>
+      <div class="fg"><label>البيان / الوصف</label><textarea id="jrnDesc" placeholder="مثال: تحويل من انستا لشراء أجهزة علاج طبيعي..."></textarea></div>
+      <div class="fg"><label>التاريخ</label><input type="date" id="jrnDate" style="padding:8px;border:1px solid var(--ibdr);border-radius:8px;background:var(--inp);color:var(--txt);font-family:inherit;color-scheme:dark;width:100%"></div>
+      <button class="btn" onclick="addJrnEntry()">💾 تسجيل القيد</button>
+    </div>
+    <div class="tsec">
+      <div class="shdr"><h3>📒 سجل القيود المحاسبية</h3><div id="jrnTotal" style="font-size:12px;color:var(--muted)"></div></div>
+      <table>
+        <thead><tr><th>التاريخ</th><th>من</th><th>إلى</th><th>المبلغ</th><th>البيان</th><th>بواسطة</th><th></th></tr></thead>
+        <tbody id="jrnTable"></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 </div><!-- end MA -->
@@ -726,6 +987,7 @@ function setupFBListeners() {
   fbListen('services',         'ma_svcs',         ()=>{ ldSSels2(); });
   fbListen('handovers',        'ma_hws',          ()=>{ calcDb(); });
   fbListen('notifications',    'ma_nf',           ()=>{ rndNf(); });
+  fbListen('active_day','ma_active_day',v=>{if(v)localStorage.setItem('ma_active_day',v);checkShiftWarn();});
   fbListen('deleted',          'ma_del',          ()=>{ if(document.getElementById('DL')?.closest('.tbc.on')) ldDL(); });
   fbListen('cash',             'ma_cash',         v =>{ localStorage.setItem('ma_cash', v); calcDb(); });
   fbListen('appointments/'+today, ak(today),      ()=>{ ldAps(); calcDb(); });
@@ -782,6 +1044,13 @@ const gL=k=>{try{return JSON.parse(localStorage.getItem(k))||[];}catch{return []
 const sL=(k,v)=>{localStorage.setItem(k,JSON.stringify(v));fbSet(k,v);};
 const gO=k=>{try{return JSON.parse(localStorage.getItem(k))||{};}catch{return {};}};
 function tds(){return new Date().toISOString().split('T')[0];}
+function activeDay(){
+  const ad=localStorage.getItem('ma_active_day');
+  if(ad&&ad!==tds()){return ad;} // prev day still open
+  return tds();
+}
+function setActiveDay(d){localStorage.setItem('ma_active_day',d);if(FB_ON())_db.ref('mada/active_day').set(d).catch(()=>{});}
+
 function mns(){return tds().slice(0,7);}
 function ak(d){return 'ma_ap_'+(d||tds());}
 function ek(m){return 'ma_ex_'+(m||mns());}
@@ -855,15 +1124,36 @@ function gExR(){const a=[];getDays().forEach(d=>{const m=d.slice(0,7);gEx(m).fil
 
 /* AUTH */
 let CU=null;
-async function doLogin(){
+
+function doLogin(){ return doLoginFallback(); }
+function doLoginFallback(){
   const u=g('lu').value.trim(),p=g('lp').value;
   if(!u||!p){shLE('أدخل اسم المستخدم وكلمة المرور');return;}
-  await fbPullUsers(); // pull latest users from Firebase before checking
-  const usr=gUs().find(x=>x.un===u&&x.pw===p&&x.act!==false);
-  if(!usr){shLE('اسم المستخدم أو كلمة المرور غلط');return;}
-  CU=usr;sL('ma_sess',{...usr,lt:new Date().toISOString()});
-  g('le').style.display='none';g('LS').style.display='none';g('MA').style.display='block';
+  const btn=g('lbtn');if(btn){btn.textContent='جاري...';btn.disabled=true;}
+  // Always check localStorage first (works offline & first load)
+  let users=gUs();
+  if(!users.length){
+    // Emergency seed if somehow empty
+    users=[{id:1,name:'المدير',un:'admin',pw:'admin123',role:'مدير',act:true}];
+    localStorage.setItem('ma_usrs',JSON.stringify(users));
+  }
+  const usr=users.find(x=>x.un===u&&x.pw===p&&x.act!==false);
+  if(!usr){
+    shLE('اسم المستخدم أو كلمة المرور غلط');
+    if(btn){btn.textContent='تسجيل الدخول';btn.disabled=false;}
+    // Try Firebase in background for next attempt
+    if(FB_ON())fbPullUsers().then(()=>{}).catch(()=>{});
+    return;
+  }
+  CU=usr;
+  localStorage.setItem('ma_sess',JSON.stringify({...usr,lt:new Date().toISOString()}));
+  if(btn){btn.textContent='تسجيل الدخول';btn.disabled=false;}
+  g('le').style.display='none';
+  g('LS').style.display='none';
+  g('MA').style.display='block';
   initApp();
+  // Now sync Firebase in background
+  if(FB_ON())fbSeedIfEmpty().catch(()=>{});
 }
 function shLE(m){const e=g('le');e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',3000);}
 function doLogout(){
@@ -887,27 +1177,39 @@ function swTab(btn){
   const tid=btn.getAttribute('data-tab');
   document.querySelectorAll('.tbc').forEach(t=>t.classList.remove('on'));
   document.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('on'));
-  g(tid).classList.add('on');btn.classList.add('on');
-  if(tid==='td')calcDb();
-  if(tid==='tp'){clNPF();clPP();rndPL();}
-  if(tid==='ta'){ldAps();ldSSels();}
-  if(tid==='te')ldExps();
-  if(tid==='ts')ldSt();
-  if(tid==='tpr')ldSvcs();
-  if(tid==='tan')rndAn();
-  if(tid==='tu')ldUsrs();
-  if(tid==='tdl')ldDL();
-  if(tid==='tst')initSt();
+  const tabEl=g(tid);if(tabEl)tabEl.classList.add('on');
+  btn.classList.add('on');
+  if(tid==='td')  calcDb();
+  if(tid==='tp')  {clNPF();clPP();rndPL();}
+  if(tid==='ta')  {ldAps();ldSSels();ldSSels2();}
+  if(tid==='te')  ldExps();
+  if(tid==='ts')  ldSt();
+  if(tid==='tpr') ldSvcs();
+  if(tid==='tan') rndAn();
+  if(tid==='tdoc') ldDocView();
+  if(tid==='tu')  ldUsrs();
+  if(tid==='tdl') ldDL();
+  if(tid==='tst') initSt();
+  if(tid==='trp') {const rb=g('rBox');if(rb&&!rb.textContent.trim())rb.textContent='اضغط Generate لإنشاء التقرير...';}
+  if(tid==='ttr') ldTransfers();
+  if(tid==='tsal'){ldSalEmpSel();const sm=g('salMonth');if(sm&&!sm.value)sm.value=mns();rndSalaries();}
+  if(tid==='tjrn'){const jd=g('jrnDate');if(jd&&!jd.value)jd.value=tds();ldJrn();}
 }
 
 /* NOTIFICATIONS */
 function tgNotif(){g('nd').classList.toggle('open');}
 document.addEventListener('click',e=>{if(!e.target.closest('.nwrap'))g('nd').classList.remove('open');});
 function rndNf(){
-  const nf=gNf().filter(n=>!n.rd&&(CU?.role==='مدير'||n.tou===CU?.un));
-  const c=nf.length;const cel=g('nc');
-  if(c>0){cel.textContent=c;cel.style.display='flex';}else{cel.style.display='none';}
-  if(!c){g('nl').innerHTML='<div class="empty" style="padding:12px"><p>لا توجد إشعارات</p></div>';return;}
+  // Badge count = pending transfers
+  if(CU?.role==='مدير'){
+    const pending=gHW().filter(x=>x.st==='pending').length;
+    const cel=g('nc');
+    if(pending>0){cel.textContent=pending;cel.style.display='flex';}
+    else cel.style.display='none';
+  }
+  // Notification list
+  const nf=gNf().filter(n=>!n.rd&&(CU?.role==='مدير'||n.toR===CU?.role||n.tou===CU?.un));
+  if(!nf.length){g('nl').innerHTML='<div class="empty" style="padding:12px"><p>لا توجد إشعارات</p></div>';return;}
   g('nl').innerHTML=nf.map(n=>`<div class="nitem"><div class="nititle">${n.ti}</div><div class="nisub">${n.bo}</div>${n.ty==='hw'&&CU?.role==='مدير'?`<div class="niacts"><button class="bsm bok" style="font-size:10px" onclick="cnfHWNf('${n.id}')">✅ تأكيد</button><button class="bsm bdng" style="font-size:10px" onclick="rjHWNf('${n.id}')">❌ رفض</button></div>`:''}</div>`).join('');
 }
 function addNf(nf){const a=gNf();a.push({id:Date.now().toString(),rd:false,ca:new Date().toISOString(),...nf});sNf(a);rndNf();}
@@ -940,14 +1242,9 @@ function resDel(id){
 function ldSt(){
   const st=gSt(),tb=g('stT');
   if(!st.length){tb.innerHTML='<tr><td colspan="3"><div class="empty"><div class="ei">🩺</div><p>لا يوجد طاقم</p></div></td></tr>';return;}
-  tb.innerHTML=st.map(s=>`<tr data-tip="أضيف بواسطة: ${s.by||'النظام'} | ${s.at||''}"><td><b>${s.name}</b></td><td>${s.spec}</td><td><button class="bsm bdng" onclick="delSt(${s.id})">🗑</button></td></tr>`).join('');
+  tb.innerHTML=st.map(s=>`<tr data-tip="أضيف بواسطة: ${s.by||'النظام'} | ${s.at||''}"><td><b>${s.name}</b></td><td>${s.spec}</td><td>${CU?.role==='مدير'?`<button class="bsm bdng" onclick="delSt(${s.id})">🗑</button>`:''}</td></tr>`).join('');
 }
-function addSt(){
-  const n=g('stN').value.trim(),sp=g('stSp').value.trim();
-  if(!n||!sp){sT('⚠️ أدخل الاسم والتخصص','w');return;}
-  const st=gSt();st.push({id:Date.now(),name:n,spec:sp,by:CU?.name,at:new Date().toLocaleString('ar-EG')});
-  sSt(st);g('stN').value='';g('stSp').value='';ldSt();ldSSels();sT(`✅ تم إضافة ${n}`);
-}
+/* addSt defined below with job type */
 function delSt(id){
   const s=gSt().find(x=>x.id===id);
   askConf('حذف طبيب',`هل تريد حذف ${s?.name}؟`,()=>{sSt(gSt().filter(x=>x.id!==id));ldSt();ldSSels();sT('🗑️ تم الحذف');},'🗑️');
@@ -960,17 +1257,18 @@ function ldSSels(){
 const DSVCS=[{id:1,name:'كشف جديد',price:300,cat:'كشوفات',act:true},{id:2,name:'جلسة علاج طبيعي',price:200,cat:'جلسات',act:true},{id:3,name:'باكج تأهيل مكثف',price:1500,cat:'باكجات',act:true}];
 function ldSvcs(){
   const sv=gSv(),tb=g('svT');
-  tb.innerHTML=sv.map(s=>`<tr data-tip="أضيف بواسطة: ${s.by||'النظام'}"><td><b>${s.name}</b></td><td><span class="epill">${s.cat}</span></td><td><b>${s.price}</b> ج</td><td><span class="bdg ${s.act?'ok':'wt'}">${s.act?'نشط':'موقوف'}</span></td><td><button class="bsm" style="background:rgba(77,208,225,.15);color:var(--blue);border:1px solid var(--blue);margin-left:4px" onclick="edSvc(${s.id})">✏️</button><button class="bsm bdng" onclick="delSvc(${s.id})">🗑</button></td></tr>`).join('');
+  tb.innerHTML=sv.map(s=>`<tr data-tip="أضيف بواسطة: ${s.by||'النظام'}"><td><b>${s.name}</b></td><td><span class="epill">${s.cat}</span></td><td><b>${s.price}</b> ج ${s.insPrice?`<span style="font-size:10px;color:#8b5cf6">🛡️${s.insPrice}ج</span>`:''}</td><td><span class="bdg ${s.act?'ok':'wt'}">${s.act?'نشط':'موقوف'}</span></td><td><button class="bsm" style="background:rgba(77,208,225,.15);color:var(--blue);border:1px solid var(--blue);margin-left:4px" onclick="edSvc(${s.id})">✏️</button><button class="bsm bdng" onclick="delSvc(${s.id})">🗑</button></td></tr>`).join('');
 }
 function svSvc(){
   const n=g('svN').value.trim(),p=parseFloat(g('svP').value),c=g('svC').value,eid=g('svEid').value;
   if(!n||!p){sT('⚠️ أدخل الاسم والسعر','w');return;}
+  const insP=parseFloat(g('svInsP')?.value||'0');
   let sv=gSv();
-  if(eid){sv=sv.map(s=>s.id==eid?{...s,name:n,price:p,cat:c}:s);g('svEid').value='';}
-  else{sv.push({id:Date.now(),name:n,price:p,cat:c,act:true,by:CU?.name,at:new Date().toLocaleString('ar-EG')});}
+  if(eid){sv=sv.map(s=>s.id==eid?{...s,name:n,price:p,cat:c,insPrice:insP||null}:s);g('svEid').value='';}
+  else{sv.push({id:Date.now(),name:n,price:p,cat:c,insPrice:insP||null,act:true,by:CU?.name,at:new Date().toLocaleString('ar-EG')});}
   sSv(sv);g('svN').value='';g('svP').value='';ldSvcs();ldSSels2();sT('✅ تم حفظ الخدمة');
 }
-function edSvc(id){const s=gSv().find(x=>x.id===id);if(!s)return;g('svN').value=s.name;g('svP').value=s.price;g('svC').value=s.cat;g('svEid').value=id;}
+function edSvc(id){const s=gSv().find(x=>x.id===id);if(!s)return;g('svN').value=s.name;g('svP').value=s.price;g('svC').value=s.cat;if(g('svInsP'))g('svInsP').value=s.insPrice||0;g('svEid').value=id;}
 function delSvc(id){
   const s=gSv().find(x=>x.id===id);
   askConf('حذف خدمة',`حذف "${s?.name}"؟`,()=>{sSv(gSv().filter(x=>x.id!==id));ldSvcs();ldSSels2();sT('🗑️ تم الحذف');},'🗑️');
@@ -984,7 +1282,23 @@ function vphn(el){const v=el.value.replace(/\D/g,'');if(v.length>0&&v.length<11)
 
 /* PATIENTS */
 let CPI=null;
-function nxtPID(){const n=(parseInt(localStorage.getItem('ma_psc')||'0')+1);localStorage.setItem('ma_psc',n);if(FB_ON())_db.ref('mada/patientSeq').set(n).catch(()=>{});return 'م-'+String(n).padStart(4,'0');}
+let aptFilterDay=null;
+function nxtPID(){
+  // Get sequence from localStorage
+  let n = parseInt(localStorage.getItem('ma_psc')||'0') + 1;
+  // Safety check: scan existing patients to prevent duplicate IDs
+  const existingPts = gPt();
+  if (existingPts.length > 0) {
+    const maxExisting = Math.max(...existingPts.map(p => {
+      const m = (p.id||'').match(/(\d+)$/);
+      return m ? parseInt(m[1]) : 0;
+    }));
+    if (maxExisting >= n) n = maxExisting + 1;
+  }
+  localStorage.setItem('ma_psc', n);
+  if (FB_ON()) _db.ref('mada/patientSeq').set(n).catch(()=>{});
+  return 'م-' + String(n).padStart(4, '0');
+}
 function opNPF(){g('pLV').style.display='none';g('pPV').style.display='none';g('pNF').style.display='block';}
 function clNPF(){g('pNF').style.display='none';g('pLV').style.display='block';}
 function svNP(){
@@ -993,7 +1307,8 @@ function svNP(){
   if(ph&&ph.length<11){sT('⚠️ رقم التليفون أقل من 11 رقم','w');g('pPh').classList.add('err');return;}
   const ch=[...document.querySelectorAll('input[name="ch"]:checked')].map(x=>x.value);
   const sg=document.querySelector('input[name="ps"]:checked')?.value||'لا';
-  const pt={id:nxtPID(),name:n,phone:ph,age:g('pA').value||null,gender:g('pG').value||null,area:g('pAr').value||null,job:g('pJ').value||null,complaint:c,dur:g('pD').value,diag:g('pDg').value,chronic:ch,meds:g('pM').value,surgery:sg,surgD:g('pSd').value,injury:g('pInj').value,ref:g('pRef').value,notes:g('pNo').value,sessions:[],disc:null,by:CU?.name,at:new Date().toISOString()};
+  const insurance=document.querySelector('input[name="pins"]:checked')?.value||'لا';
+  const pt={id:nxtPID(),name:n,phone:ph,age:g('pA').value||null,gender:g('pG').value||null,area:g('pAr').value||null,job:g('pJ').value||null,complaint:c,dur:g('pD').value,diag:g('pDg').value,chronic:ch,meds:g('pM').value,surgery:sg,surgD:g('pSd').value,injury:g('pInj').value,ref:g('pRef').value,notes:g('pNo').value,insurance,sessions:[],disc:null,by:CU?.name,at:new Date().toISOString()};
   const pts=gPt();pts.push(pt);sPt(pts);
   ['pN','pPh','pA','pAr','pJ','pC','pD','pDg','pM','pSd','pInj','pNo'].forEach(id=>{const el=g(id);if(el)el.value='';});
   document.querySelectorAll('input[name="ch"]').forEach(x=>x.checked=false);
@@ -1022,7 +1337,13 @@ function opPP(pid){
 function clPP(){CPI=null;g('pPV').style.display='none';g('pLV').style.display='block';}
 function swPT(id,btn){document.querySelectorAll('.ptc').forEach(t=>t.classList.remove('on'));document.querySelectorAll('.ptbt').forEach(b=>b.classList.remove('on'));g(id).classList.add('on');btn.classList.add('on');}
 function rndPI(p){
-  g('piC').innerHTML=`<div class="full"><div class="fr" style="margin-bottom:9px"><div style="font-size:12px"><b style="color:var(--muted);font-size:10px">الشكوى</b><br>${p.complaint||'—'}</div><div style="font-size:12px"><b style="color:var(--muted);font-size:10px">التشخيص</b><br>${p.diag||'—'}</div></div><div class="fr" style="margin-bottom:9px"><div style="font-size:12px"><b style="color:var(--muted);font-size:10px">المدة</b><br>${p.dur||'—'}</div><div style="font-size:12px"><b style="color:var(--muted);font-size:10px">المنطقة</b><br>${p.area||'—'}</div></div><div class="fr" style="margin-bottom:9px"><div style="font-size:12px"><b style="color:var(--muted);font-size:10px">السوابق</b><br>${p.chronic?.join(' | ')||'لا يوجد'}</div><div style="font-size:12px"><b style="color:var(--muted);font-size:10px">عمليات سابقة</b><br>${p.surgery} ${p.surgD?'— '+p.surgD:''}</div></div><div class="fr"><div style="font-size:12px"><b style="color:var(--muted);font-size:10px">الأدوية</b><br>${p.meds||'لا يوجد'}</div><div style="font-size:12px"><b style="color:var(--muted);font-size:10px">مصدر الإحالة</b><br>${p.ref||'—'}</div></div>${p.notes?`<div style="font-size:12px;margin-top:9px"><b style="color:var(--muted);font-size:10px">ملاحظات</b><br>${p.notes}</div>`:''}</div>`;
+  g('piC').innerHTML=`<div class="full"><div class="fr" style="margin-bottom:9px"><div style="font-size:12px"><b style="color:var(--muted);font-size:10px">الشكوى</b><br>${p.complaint||'—'}</div><div style="font-size:12px"><b style="color:var(--muted);font-size:10px">التشخيص</b><br>${p.diag||'—'}</div></div><div class="fr" style="margin-bottom:9px"><div style="font-size:12px"><b style="color:var(--muted);font-size:10px">المدة</b><br>${p.dur||'—'}</div><div style="font-size:12px"><b style="color:var(--muted);font-size:10px">المنطقة</b><br>${p.area||'—'}</div></div><div class="fr" style="margin-bottom:9px"><div style="font-size:12px"><b style="color:var(--muted);font-size:10px">السوابق</b><br>${p.chronic?.join(' | ')||'لا يوجد'}</div><div style="font-size:12px"><b style="color:var(--muted);font-size:10px">عمليات سابقة</b><br>${p.surgery} ${p.surgD?'— '+p.surgD:''}</div></div><div class="fr"><div style="font-size:12px"><b style="color:var(--muted);font-size:10px">الأدوية</b><br>${p.meds||'لا يوجد'}</div><div style="font-size:12px"><b style="color:var(--muted);font-size:10px">مصدر الإحالة</b><br>${p.ref||'—'}</div></div>${p.notes?`<div style="font-size:12px;margin-top:9px"><b style="color:var(--muted);font-size:10px">ملاحظات</b><br>${p.notes}</div>`:''}</div>`;;
+  // Add PDF button
+  const pdfBtn=document.createElement('button');
+  pdfBtn.className='btn';pdfBtn.style.cssText='margin-top:12px;background:#6366f1;padding:11px';
+  pdfBtn.innerHTML='🖨️ طباعة تقرير المريض PDF';
+  pdfBtn.onclick=()=>printPDF(p.id);
+  const piC=g('piC');if(piC)piC.appendChild(pdfBtn);
 }
 function rndPS(p){
   const ss=p.sessions||[];
@@ -1033,7 +1354,10 @@ function addPS(){
   const sel=g('pSS'),sn=sel.value,pr=parseInt(sel.options[sel.selectedIndex]?.getAttribute('data-p')||'0'),dc=g('pDS')?.value;
   if(!sn||!dc){sT('⚠️ اختار الخدمة والدكتور','w');return;}
   const pts=gPt(),pi=pts.findIndex(x=>x.id===CPI);if(pi<0)return;
-  const p=pts[pi],d=p.disc?.act?p.disc.pct:0,da=Math.round(pr*d/100),fp=pr-da;
+  const p=pts[pi];
+  const svcData=gSv().find(sv=>sv.name===sn);
+  const useIns=p.insurance==='نعم'&&svcData?.insPrice;
+  const fp=useIns?svcData.insPrice:pr,da=useIns?(pr-svcData.insPrice):0,d=useIns?Math.round(da/pr*100):0;
   const s={sid:Date.now().toString(),dt:tds(),svc:sn,doc:dc,op:pr,dp:d,da:da,fp:fp,dr:p.disc?.reason||null,st:'waiting',pm:null,by:CU?.name,at:new Date().toISOString()};
   pts[pi].sessions=[...(pts[pi].sessions||[]),s];sPt(pts);
   const ap=gAp();ap.push({id:parseInt(s.sid),name:p.name,phone:p.phone,svc:sn,doc:dc,price:fp,op:pr,dp:d,pid:p.id,sid:s.sid,st:'waiting',pm:null,by:CU?.name,at:new Date().toISOString()});
@@ -1073,20 +1397,23 @@ function lkPat(ph){
   else{r.style.display='none';}
 }
 function ldAps(){
-  const ap=gApR(),tb=g('aT');
+  const ap=aptFilterDay?gAp(aptFilterDay):(!fF&&!fT?gAp(activeDay()):gApR()),tb=g('aT');
   if(!ap.length){tb.innerHTML='<tr><td colspan="7"><div class="empty"><div class="ei">📅</div><p>لا توجد حجوزات</p></div></td></tr>';return;}
   const pi={cash:'💵',instapay:'📱',wallet:'🏦'};
-  tb.innerHTML=ap.map(a=>`<tr data-tip="أضيف بواسطة: ${a.by||'—'} | ${a.at?new Date(a.at).toLocaleString('ar-EG'):'—'}"><td><b>${a.name}</b><br><small style="color:var(--muted)">${a.phone||''}</small></td><td>${a.svc||a.service||''}${a.dp?` <span class="sdb">-${a.dp}%</span>`:''}</td><td>${a.doc||a.doctor||''}</td><td><b>${a.price}</b> ج${a.op&&a.op!==a.price?`<br><small style="color:var(--muted);text-decoration:line-through">${a.op}</small>`:''}</td><td>${a.st==='done'&&a.pm?(pi[a.pm]||'')+'':''}</td><td>${a.st==='done'?'<span class="bdg ok">✅ تم</span>':`<span class="bdg wt" onclick="opAppPay(${a.id})">⏳ دفع</span>`}</td><td><button class="bsm bdng" onclick="delApp(${a.id})">🗑</button></td></tr>`).join('');
+  tb.innerHTML=ap.map(a=>`<tr data-tip="أضيف بواسطة: ${a.by||'—'} | ${a.at?new Date(a.at).toLocaleString('ar-EG'):'—'}"><td><b>${a.name}</b><br><small style="color:var(--muted)">${a.phone||''}</small></td><td>${a.svc||a.service||''}${a.dp?` <span class="sdb">-${a.dp}%</span>`:''}</td><td>${a.doc||a.doctor||''}</td><td><b>${a.price}</b> ج${a.op&&a.op!==a.price?`<br><small style="color:var(--muted);text-decoration:line-through">${a.op}</small>`:''}</td><td>${a.st==='done'&&a.pm?(pi[a.pm]||'')+'':''}</td><td>${a.st==='done'?'<span class="bdg ok">✅ تم</span>':`<span class="bdg wt" onclick="opAppPay(${a.id})">⏳ دفع</span>`}</td><td>${CU?.role==='مدير'?`<button class="bsm bdng" onclick="delApp(${a.id})">🗑</button>`:''}</td></tr>`).join('');
 }
 function addApp(){
   const n=g('aN').value.trim(),ph=g('aPh').value.trim();
   const sel=g('aS'),sn=sel.value,pr=parseInt(sel.options[sel.selectedIndex]?.getAttribute('data-p')||'0');
   const dc=g('aD').value;if(!n||!dc){sT('⚠️ أدخل الاسم والدكتور','w');return;}
   const pt=ph?gPt().find(x=>x.phone===ph):null;
-  const d=pt?.disc?.act?pt.disc.pct:0,fp=pr-Math.round(pr*d/100);
-  const ap=gAp();ap.push({id:Date.now(),name:n,phone:ph,svc:sn,doc:dc,price:fp,op:pr,dp:d,pid:pt?.id||null,st:'waiting',pm:null,by:CU?.name,at:new Date().toISOString()});
-  sAp(ap);g('aN').value='';g('aPh').value='';g('plr').style.display='none';
-  ldAps();calcDb();sT(`✅ تم تسجيل ${n}`+(d?` بخصم ${d}%`:''));
+  // No auto-discount — manual only per session
+  const bDateRadio=document.querySelector('input[name="aptDate"]:checked')?.value;
+  const bDate=(bDateRadio==='future'&&g('aptBookDate')?.value)?g('aptBookDate').value:activeDay();
+  const ap=gAp(bDate);ap.push({id:Date.now(),name:n,phone:ph,svc:sn,doc:dc,price:pr,op:pr,dp:0,pid:pt?.id||null,sid:null,st:'waiting',pm:null,bookDate:bDate,by:CU?.name,at:new Date().toISOString()});
+  sAp(ap,bDate);g('aN').value='';g('aPh').value='';g('plr').style.display='none';if(g('aptBookFields'))g('aptBookFields').style.display='none';
+  if(bDate!==activeDay())sT(`✅ حجز مستقبلي ليوم ${bDate}`);
+  ldAps();calcDb();sT(`✅ تم تسجيل ${n}`);
 }
 function opAppPay(id){
   const a=gApR().find(x=>x.id===id);if(!a)return;
@@ -1117,7 +1444,7 @@ async function anRc(){
 }
 function cnfPay(){
   if(!_pm){sT('⚠️ اختار وسيلة الدفع','w');return;}
-  if((_pm==='instapay'||_pm==='wallet')&&!_id){sT('⚠️ ارفع الإيصال','w');return;}
+  // Receipt upload is optional — removed mandatory requirement
   const lbs={cash:'💵 كاش',instapay:'📱 انستاباي',wallet:'🏦 محفظة'};
   if(_payId){
     const day=tds();let ap=gAp(day),a=ap.find(x=>x.id===_payId);
@@ -1129,7 +1456,9 @@ function cnfPay(){
     const pts=gPt(),pi=pts.findIndex(x=>x.id===_pppid);if(pi<0)return;
     const s=pts[pi].sessions?.find(x=>x.sid===_ppsi);
     pts[pi].sessions=(pts[pi].sessions||[]).map(x=>x.sid===_ppsi?{...x,st:'done',pm:_pm}:x);
-    sPt(pts);if(_pm==='cash'&&s)aCsh(s.fp);
+    sPt(pts);
+    if(_pm==='cash'&&s)aCsh(s.fp);
+    else if(s){const k='ma_bal_'+_pm;const cur=parseFloat(localStorage.getItem(k)||'0');localStorage.setItem(k,cur+(s.fp||0));if(FB_ON())_db.ref('mada/bal_'+_pm).set(cur+(s.fp||0)).catch(()=>{});}
   }
   g('pyMo').classList.remove('on');ldAps();calcDb();
   if(CPI)opPP(CPI);
@@ -1151,13 +1480,19 @@ function shDiscRpt(){
 function ldExps(){
   const ex=gExR(),tb=g('eT2');
   if(!ex.length){tb.innerHTML='<tr><td colspan="5"><div class="empty"><div class="ei">💸</div><p>لا توجد مصروفات</p></div></td></tr>';return;}
-  tb.innerHTML=ex.map(e=>`<tr data-tip="أضيف بواسطة: ${e.by||'—'} | ${e.at?new Date(e.at).toLocaleString('ar-EG'):'—'}"><td><span class="epill">${e.type}</span></td><td style="color:var(--muted);font-size:11px">${e.desc}</td><td><b>${e.amt}</b> ج</td><td style="font-size:11px;color:var(--muted)">${e.by||'—'}</td><td><button class="bsm bdng" onclick="delExp(${e.id})">🗑</button></td></tr>`).join('');
+  const pmIcons={'cash':'💵','instapay':'📱','wallet':'🏦'};
+  tb.innerHTML=ex.map(e=>`<tr data-tip="أضيف بواسطة: ${e.by||'—'} | ${e.at?new Date(e.at).toLocaleString('ar-EG'):'—'}"><td><span class="epill">${e.type}</span></td><td style="color:var(--muted);font-size:11px">${e.desc}</td><td><b>${e.amt}</b> ج</td><td>${pmIcons[e.pm]||'💵'}</td><td style="font-size:11px;color:var(--muted)">${e.by||'—'}</td><td>${CU?.role==='مدير'?`<button class="bsm bdng" onclick="delExp(${e.id})">🗑</button>`:''}</td></tr>`).join('');
 }
 function addExp(){
   const t=g('eT').value,d=g('eD').value.trim(),a=parseFloat(g('eA').value);
+  const pm=document.querySelector('input[name="epm"]:checked')?.value||'cash';
   if(!d||!a||a<=0){sT('⚠️ أكمل بيانات المصروف','w');return;}
-  const ex=gEx();ex.push({id:Date.now(),type:t,desc:d,amt:a,dt:tds(),by:CU?.name,at:new Date().toISOString()});
-  sEx(ex);g('eD').value='';g('eA').value='';ldExps();calcDb();sT('✅ تم تسجيل المصروف');
+  const ex=gEx();ex.push({id:Date.now(),type:t,desc:d,amt:a,pm,dt:activeDay(),by:CU?.name,at:new Date().toISOString()});
+  sEx(ex);
+  // deduct from correct account
+  if(pm==='cash'){sCsh(Math.max(0,gCsh()-a));}
+  else{const k='ma_bal_'+pm;const cur=parseFloat(localStorage.getItem(k)||'0');localStorage.setItem(k,Math.max(0,cur-a));if(FB_ON())_db.ref('mada/bal_'+pm).set(Math.max(0,cur-a)).catch(()=>{});}
+  g('eD').value='';g('eA').value='';ldExps();calcDb();sT('✅ تم تسجيل المصروف من حساب '+pm);
 }
 function delExp(id){
   const ex=gEx(),e=ex.find(x=>x.id===id);
@@ -1174,11 +1509,24 @@ function calcDb(){
   const rev=sm(done),tExp=ex.reduce((s,e)=>s+(e.amt||0),0);
   g('kR').textContent=rev.toLocaleString()+' ج';
   g('kC').textContent=sm(cash).toLocaleString()+' ج';g('kCc').textContent=cash.length+' tx';
-  g('kI').textContent=sm(ins).toLocaleString()+' ج';g('kIc').textContent=ins.length+' tx';
-  g('kW').textContent=sm(wal).toLocaleString()+' ج';g('kWc').textContent=wal.length+' tx';
+  // Net balance = income received - expenses paid from that account
+  const insIncome=done.filter(a=>a.pm==='instapay').reduce((s,a)=>s+(a.price||0),0);
+  const walIncome=done.filter(a=>a.pm==='wallet').reduce((s,a)=>s+(a.price||0),0);
+  const expsAll=gExR();
+  const insExp=expsAll.filter(e=>e.pm==='instapay').reduce((s,e)=>s+(e.amt||0),0);
+  const walExp=expsAll.filter(e=>e.pm==='wallet').reduce((s,e)=>s+(e.amt||0),0);
+  const insBal=insIncome-insExp;
+  const walBal=walIncome-walExp;
+  // Also fix cash balance: cash received - cash expenses
+  const cashIncome=done.filter(a=>a.pm==='cash').reduce((s,a)=>s+(a.price||0),0);
+  const cashExp=expsAll.filter(e=>e.pm==='cash').reduce((s,e)=>s+(e.amt||0),0);
+  const realCash=cashIncome-cashExp;
+  // Update safe amount to reflect real cash
+  g('sA').textContent=realCash.toLocaleString()+' ج';
+  g('kI').textContent=insBal.toLocaleString()+' ج';g('kIc').textContent=ins.length+' tx';
+  g('kW').textContent=walBal.toLocaleString()+' ج';g('kWc').textContent=wal.length+' tx';
   g('kT').textContent=ap.length;g('kWt').textContent=ap.filter(a=>a.st==='waiting').length+' waiting';
   g('kE').textContent=tExp.toLocaleString()+' ج';g('kEc').textContent=ex.length+' items';
-  g('sA').textContent=gCsh().toLocaleString()+' ج';
   const hws=gHW(),lhw=hws.length?hws[hws.length-1]:null;
   g('sS').textContent=lhw?'آخر توريد: '+new Date(lhw.dt).toLocaleDateString('ar-EG'):'لم يتم توريد بعد';
   initWkCh(rev);
@@ -1274,7 +1622,13 @@ function delUsr(id){
 
 /* AI REPORT */
 async function genRpt(){
-  const rb=g('rBox');rb.className='rpbox';rb.textContent='⏳ جاري إنشاء التقرير...';
+  const rb=g('rBox');rb.className='rpbox';
+  // Check if running from file:// — CORS will block API calls
+  if(window.location.protocol==='file:'){
+    rb.textContent=`⚠️ لتشغيل التقارير، يجب فتح الملف من رابط GitHub Pages أو سيرفر — لا يمكن استخدام الـ API من file:// بسبب قيود المتصفح (CORS).\n\nافتح: https://mohamedmdwar55555-arch.github.io/clinic/`;
+    return;
+  }
+  rb.textContent='⏳ جاري إنشاء التقرير...';
   const ap=gAp(),done=ap.filter(a=>a.st==='done'),ex=gEx();
   const rev=done.reduce((s,a)=>s+(a.price||0),0),tE=ex.reduce((s,e)=>s+(e.amt||0),0);
   const cash=done.filter(a=>a.pm==='cash').reduce((s,a)=>s+(a.price||0),0);
@@ -1307,24 +1661,38 @@ document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',e=>{if(e.
 /* INIT */
 const DSTF=[{id:1,name:'كشف جديد',price:300,cat:'كشوفات',act:true,by:'النظام'},{id:2,name:'جلسة علاج طبيعي',price:200,cat:'جلسات',act:true,by:'النظام'},{id:3,name:'باكج تأهيل مكثف',price:1500,cat:'باكجات',act:true,by:'النظام'}];
 function initData(){
-  if(!localStorage.getItem('ma_usrs'))sUs([{id:1,name:'المدير',un:'admin',pw:'admin123',role:'مدير',act:true}]);
-  if(!localStorage.getItem('ma_staff'))sSt([{id:1,name:'د. أحمد إسماعيل',spec:'علاج طبيعي',by:'النظام'},{id:2,name:'د. سارة ممدوح',spec:'إصابات ملاعب',by:'النظام'}]);
-  if(!localStorage.getItem('ma_svcs'))sSv(DSTF);
+  if(!localStorage.getItem('ma_usrs'))
+    localStorage.setItem('ma_usrs',JSON.stringify([{id:1,name:'المدير',un:'admin',pw:'admin123',role:'مدير',act:true}]));
+  if(!localStorage.getItem('ma_staff'))
+    localStorage.setItem('ma_staff',JSON.stringify([{id:1,name:'د. أحمد إسماعيل',spec:'علاج طبيعي',by:'النظام'},{id:2,name:'د. سارة ممدوح',spec:'إصابات ملاعب',by:'النظام'}]));
+  if(!localStorage.getItem('ma_svcs'))
+    localStorage.setItem('ma_svcs',JSON.stringify(DSTF));
 }
 function initApp(){
   applyRC();
-  setupFBListeners();calcDb();ldAps();ldExps();ldSt();ldSSels();ldSSels2();rndPL();rndNf();
+  setupFBListeners();
+  checkShiftWarn();calcDb();ldAps();ldExps();ldSt();ldSSels();ldSSels2();rndPL();rndNf();
   const th=localStorage.getItem('ma_th')||'dark';
   document.body.setAttribute('data-theme',th);
   document.querySelectorAll('.thbt').forEach(b=>b.classList.toggle('on',b.classList.contains('th'+th.charAt(0))));
 }
-document.addEventListener('DOMContentLoaded',async ()=>{
-  initFB();
-  initData();
-  await fbSeedIfEmpty();
-  const sess=gO('ma_sess');
-  if(sess?.un){const u=gUs().find(x=>x.un===sess.un&&x.act!==false);if(u){CU=u;g('LS').style.display='none';g('MA').style.display='block';initApp();return;}}
-  g('LS').style.display='flex';
+/* DOMContentLoaded handled by SAFE LOGIN above.
+   This runs AFTER login is already set up. */
+document.addEventListener('DOMContentLoaded',function(){
+  try{initData();}catch(e){console.warn('initData:',e);}
+  try{
+    // Wait for Firebase scripts to fully load before init
+    function tryInitFB(attempts){
+      if(typeof firebase !== 'undefined'){
+        initFB();
+      } else if(attempts > 0){
+        setTimeout(()=>tryInitFB(attempts-1), 500);
+      } else {
+        console.warn('Firebase scripts failed to load — running in offline mode');
+      }
+    }
+    tryInitFB(10);
+  }catch(e){}
 });
 
 /* auto-refresh Firebase listener when date changes at midnight */
@@ -1337,7 +1705,429 @@ setInterval(()=>{
   }
   window._lastDay = newDay;
 }, 60000);
+
+
+/* ══ SALARY STORAGE HELPERS ══ */
+/* ══ SALARIES FUNCTIONS ══ */
+function ldSalEmpSel(){
+  const staff=gSt(),users=gUs();
+  const all=[...staff.map(s=>({id:'st_'+s.id,name:s.name,role:'دكتور'})),
+             ...users.filter(u=>u.role!=='مدير').map(u=>({id:'us_'+u.id,name:u.name,role:u.role}))];
+  const sel=g('salEmpSel');if(!sel)return;
+  sel.innerHTML='<option value="">— اختار موظف —</option>'+
+    all.map(e=>`<option value="${e.id}">${e.name} (${e.role})</option>`).join('');
+}
+function loadSalEmp(){
+  const id=g('salEmpSel')?.value;if(!id)return;
+  const isDoc=id.startsWith('st_');
+  const df=g('salDocFields');if(df)df.style.display=isDoc?'block':'none';
+  const cfg=gSal().find(s=>s.eid===id)||{};
+  if(g('salBase'))g('salBase').value=cfg.base||0;
+  if(isDoc){
+    const rb=document.querySelector(`input[name="salType"][value="${cfg.type||'fixed'}"]`);
+    if(rb)rb.checked=true;
+    if(g('salConsultPct'))g('salConsultPct').value=cfg.cPct||0;
+    if(g('salSessionPct'))g('salSessionPct').value=cfg.sPct||0;
+    const pf=g('salPctFields');if(pf)pf.style.display=cfg.type==='pct'?'block':'none';
+  }
+}
+document.addEventListener('change',e=>{
+  if(e.target.name==='salType'){const pf=g('salPctFields');if(pf)pf.style.display=e.target.value==='pct'?'block':'none';}
+});
+function svSalary(){
+  const id=g('salEmpSel')?.value;if(!id){sT('⚠️ اختار موظف','w');return;}
+  const type=document.querySelector('input[name="salType"]:checked')?.value||'fixed';
+  const cfg={eid:id,base:parseFloat(g('salBase')?.value)||0,type,cPct:parseFloat(g('salConsultPct')?.value)||0,sPct:parseFloat(g('salSessionPct')?.value)||0};
+  const sal=gSal().filter(s=>s.eid!==id);sal.push(cfg);sSal(sal);
+  sT('✅ تم حفظ المرتب');rndSalaries();
+}
+function rndSalaries(){
+  const mon=g('salMonth')?.value||mns();
+  const staff=gSt(),sal=gSal();
+  const year=parseInt(mon.split('-')[0]),month=parseInt(mon.split('-')[1]);
+  const days=[];
+  for(let d=1;d<=31;d++){
+    const dt=`${mon}-${String(d).padStart(2,'0')}`;
+    if(new Date(dt).getMonth()+1===month&&new Date(dt).getFullYear()===year)days.push(dt);
+  }
+  const allAp=days.flatMap(d=>gL(ak(d)).filter(a=>a.st==='done'||a.st==='with-doctor'));
+  const c=g('salTable');if(!c)return;
+  const emps=[...staff.map(s=>({id:'st_'+s.id,name:s.name,role:'دكتور',icon:'🩺'})),
+              ...gUs().filter(u=>u.role!=='مدير').map(u=>({id:'us_'+u.id,name:u.name,role:u.role,icon:u.role==='سكرتارية'?'💼':'👤'}))];
+  if(!emps.length){c.innerHTML='<div class="empty"><div class="ei">💰</div><p>لا يوجد موظفون</p></div>';return;}
+  c.innerHTML=emps.map(emp=>{
+    const cfg=sal.find(s=>s.eid===emp.id)||{base:0,type:'fixed'};
+    const empAp=allAp.filter(a=>(a.doc||a.doctor)===emp.name);
+    const consults=empAp.filter(a=>(a.svc||'').includes('كشف')).length;
+    const sessions=empAp.filter(a=>(a.svc||'').includes('جلسة')).length;
+    const rev=empAp.reduce((s,a)=>s+(a.price||0),0);
+    let salary=cfg.base||0;
+    if(cfg.type==='pct'&&emp.role==='دكتور'){
+      salary=empAp.reduce((s,a)=>{
+        const pct=(a.svc||a.service||'').includes('كشف')?cfg.cPct:cfg.sPct;
+        return s+((a.price||0)*(pct||0)/100);
+      },0);
+    }
+    return `<div class="sal-card">
+      <div class="sal-avatar">${emp.icon}</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:14px;color:var(--txt)">${emp.name}</div>
+        <div style="font-size:11px;color:var(--muted)">${emp.role} — ${cfg.type==='pct'?'نسبة':'ثابت'}</div>
+        <div style="font-size:12px;margin-top:5px;display:flex;gap:10px;flex-wrap:wrap;color:var(--muted)">
+          <span>📋 كشوف: <b style="color:var(--txt)">${consults}</b></span>
+          <span>💆 جلسات: <b style="color:var(--txt)">${sessions}</b></span>
+          <span>💵 إيرادات: <b style="color:var(--ok)">${rev.toLocaleString()} ج</b></span>
+        </div>
+      </div>
+      <div style="text-align:center;min-width:90px">
+        <div style="font-size:22px;font-weight:900;color:var(--ok)">${Math.round(salary).toLocaleString()} ج</div>
+        <div style="font-size:10px;color:var(--muted)">المرتب</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+const gSal=()=>gL('ma_sal');
+const sSal=s=>sL('ma_sal',s);
+
+/* ══ TRANSFERS PAGE ══ */
+function ldTransfers(){
+  const hws=gHW().slice().reverse();
+  const c=g('trList');if(!c)return;
+  if(!hws.length){c.innerHTML='<div class="empty"><div class="ei">📤</div><p>لا توجد طلبات توريد</p></div>';return;}
+  c.innerHTML=hws.map(hw=>`
+    <div class="tritem ${hw.st==='confirmed'?'confirmed':hw.st==='rejected'?'rejected':''}">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-weight:700;font-size:14px;color:var(--txt)">💰 ${hw.amt.toLocaleString()} جنيه</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:3px">من: ${hw.from||'—'} | ${new Date(hw.dt).toLocaleString('ar-EG')}</div>
+          <div style="font-size:12px;color:var(--muted)">${hw.note||''}</div>
+        </div>
+        <div style="display:flex;gap:7px;align-items:center">
+          <span class="bdg ${hw.st==='confirmed'?'ok':'wt'} ${hw.st==='rejected'?'':''}">
+            ${hw.st==='confirmed'?'✅ مؤكد':hw.st==='rejected'?'❌ مرفوض':'⏳ انتظار'}
+          </span>
+          ${hw.st==='pending'?`
+            <button class="bok bsm" onclick="cnfTR('${hw.id}')">✅ تأكيد</button>
+            <button class="bsm bdng" onclick="rjTR('${hw.id}')">❌ رفض</button>
+          `:''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+function cnfTR(id){
+  const hws=gHW().map(h=>h.id==id?{...h,st:'confirmed',confAt:new Date().toISOString(),confBy:CU?.name}:h);
+  sHW(hws);ldTransfers();rndNf();sT('✅ تم تأكيد التوريد');
+}
+function rjTR(id){
+  const hw=gHW().find(h=>h.id==id);
+  const hws=gHW().map(h=>h.id==id?{...h,st:'rejected',rjAt:new Date().toISOString(),rjBy:CU?.name}:h);
+  sHW(hws);
+  addNf({ty:'rj',ti:'❌ تم رفض التوريد',bo:`التوريد ${hw?.amt?.toLocaleString()} ج مرفوض — راجع المدير لمطابقة الحسابات`,toR:'سكرتارية'});
+  ldTransfers();rndNf();sT('تم رفض التوريد','e');
+}
+
+/* ══ DOCTOR PORTAL ══ */
+const PAIN_MAP={
+  'رأس|صداع|وجه|دوخة|head|skull':['head'],
+  'رقبة|عنق|cervical|neck|torticollis':['neck'],
+  'كتف|shoulder|rotator|مفصل الكتف':['shoulder'],
+  'ذراع|عضد|arm|bicep|tricep':['arm'],
+  'كوع|مرفق|elbow|tennis':['elbow'],
+  'ساعد|معصم|forearm|wrist|carpal':['forearm','wrist'],
+  'يد|hand|أصابع|finger':['wrist'],
+  'صدر|ضلع|chest|rib|thoracic|ظهر علوي':['chest'],
+  'ظهر|back|قطن|lumbar|sciatic|عمود فقري|disc':['chest','pelvis'],
+  'حوض|ورك|hip|pelvis|sacrum':['pelvis','hip'],
+  'فخذ|thigh|hamstring|quadricep':['thigh'],
+  'ركبة|knee|meniscus|رباط|ACL':['knee'],
+  'ساق|leg|calf|بطة الساق|shin':['leg'],
+  'كاحل|ankle|Achilles|أشيلوس':['ankle'],
+  'قدم|foot|plantar|fascitis|إبهام':['foot'],
+};
+function highlightPain(complaint){
+  document.querySelectorAll('.sr').forEach(el=>el.classList.remove('pain','ref'));
+  if(!complaint)return;
+  const low=complaint.toLowerCase();
+  Object.entries(PAIN_MAP).forEach(([keys,regions])=>{
+    if(keys.split('|').some(k=>low.includes(k.toLowerCase()))){
+      regions.forEach(r=>document.querySelectorAll(`.sr[data-r="${r}"]`).forEach(el=>el.classList.add('pain')));
+    }
+  });
+}
+function skelView(v,btn){
+  const svg=g('skelSVG');if(!svg)return;
+  document.querySelectorAll('.sr').forEach(el=>el.classList.remove('pain','ref'));
+  svg.style.transform=v==='back'?'scaleX(-1)':v==='side'?'perspective(400px) rotateY(55deg)':'none';
+  const sel=g('docPatSel');if(sel?.value)loadDocView();
+}
+function ldDocView(){
+  const sel=g('docPatSel');if(!sel)return;
+  const ap=gAp(activeDay());
+  sel.innerHTML='<option value="">— اختار حالة —</option>'+
+    ap.filter(a=>a.st==='waiting'||a.st==='with-doctor').map(a=>`
+      <option value="${a.id}">${a.name} — ${a.svc||a.service||''} ${a.st==='with-doctor'?'👨‍⚕️':''}</option>`
+    ).join('');
+  rndWQ();
+}
+function loadDocView(){
+  const id=parseInt(g('docPatSel')?.value);if(!id)return;
+  const ap=gAp(activeDay()).find(a=>a.id===id);if(!ap)return;
+  const pt=ap.pid?gPt().find(p=>p.id===ap.pid):null;
+  highlightPain(pt?.complaint||ap.svc||'');
+  const inf=g('docPatInfo');if(!inf)return;
+  inf.innerHTML=`
+    <div class="dv-stat"><div class="dv-label">المريض</div><div class="dv-value">${ap.name}${pt?' ('+pt.id+')':''}</div></div>
+    ${pt?`
+    <div class="dv-stat"><div class="dv-label" style="color:#ff6b6b">🔴 الشكوى</div><div class="dv-value" style="color:#ff6b6b;font-size:15px">${pt.complaint||'—'}</div></div>
+    <div class="dv-stat"><div class="dv-label">التشخيص</div><div class="dv-value">${pt.diag||'—'}</div></div>
+    <div class="dv-stat"><div class="dv-label">مدة الشكوى</div><div class="dv-value">${pt.dur||'—'}</div></div>
+    <div class="fr">
+      <div class="dv-stat"><div class="dv-label">العمر</div><div class="dv-value">${pt.age||'—'}</div></div>
+      <div class="dv-stat"><div class="dv-label">النوع</div><div class="dv-value">${pt.gender||'—'}</div></div>
+    </div>
+    <div class="dv-stat"><div class="dv-label">السوابق المرضية</div><div class="dv-value">${pt.chronic?.join('، ')||'لا يوجد'}</div></div>
+    <div class="dv-stat"><div class="dv-label">الأدوية</div><div class="dv-value">${pt.meds||'لا يوجد'}</div></div>
+    <div class="dv-stat"><div class="dv-label">عمليات سابقة</div><div class="dv-value">${pt.surgery} ${pt.surgD?'('+pt.surgD+')':''}</div></div>
+    ${pt.insurance==='نعم'?'<div class="dv-stat" style="border-color:#7c3aed"><div class="dv-label">🛡️ تأمين صحي</div><div class="dv-value" style="color:#7c3aed">نعم</div></div>':''}
+    `:'<div class="dv-stat"><div class="dv-label">ملاحظة</div><div class="dv-value" style="color:var(--muted)">لا يوجد ملف طبي</div></div>'}
+    <div class="dv-stat"><div class="dv-label">الخدمة / الدكتور</div><div class="dv-value">${ap.svc||ap.service||''} — ${ap.doc||ap.doctor||''}</div></div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+      ${ap.st==='waiting'?`<button class="bok btn" style="flex:1;padding:9px" onclick="mvToDoc(${ap.id})">👨‍⚕️ إدخال عند الدكتور</button>`:''}
+      ${ap.st==='with-doctor'?`<button class="bamb" style="padding:9px 14px" onclick="mvDone(${ap.id})">✅ انتهت الجلسة — للدفع</button>`:''}
+    </div>`;
+}
+function rndWQ(){
+  const ap=gAp(activeDay()).filter(a=>a.st==='waiting');
+  const c=g('waitingQueue');if(!c)return;
+  if(!ap.length){c.innerHTML='<div class="empty" style="padding:12px"><p>قائمة الانتظار فارغة</p></div>';return;}
+  c.innerHTML=ap.map(a=>`
+    <div class="wq-item">
+      <div><b style="font-size:13px">${a.name}</b>
+        <div style="font-size:11px;color:var(--muted)">${a.svc||a.service||''} | ${a.doc||a.doctor||''}</div>
+      </div>
+      <button class="bok bsm" onclick="mvToDoc(${a.id})">إدخال 👨‍⚕️</button>
+    </div>`).join('');
+}
+function mvToDoc(id){
+  const day=activeDay();let ap=gAp(day);
+  ap=ap.map(a=>a.id===id?{...a,st:'with-doctor',docAt:new Date().toISOString()}:a);
+  sAp(ap,day);ldAps();ldDocView();rndWQ();sT('✅ تم إحالة الحالة للدكتور');
+}
+function mvDone(id){
+  const day=activeDay();let ap=gAp(day);
+  ap=ap.map(x=>x.id===id?{...x,st:'waiting'}:x);
+  sAp(ap,day);ldAps();ldDocView();sT('✅ انتهت الجلسة — جاهز للدفع');
+}
+
+/* ══ PATIENT PDF REPORT ══ */
+function printPDF(pid){
+  const p=gPt().find(x=>x.id===pid);if(!p)return;
+  const ss=p.sessions||[];
+  const paid=ss.filter(s=>s.st==='done');
+  const total=paid.reduce((s,x)=>s+(x.fp||x.op||0),0);
+  const origTotal=paid.reduce((s,x)=>s+(x.op||0),0);
+  const w=window.open('','_blank','width=900,height=700');
+  w.document.write(`<!DOCTYPE html><html dir="rtl"><head>
+    <meta charset="UTF-8"><title>تقرير ${p.name}</title>
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0;}
+      body{font-family:'Segoe UI',sans-serif;padding:32px;color:#111;direction:rtl;}
+      .hdr{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #0a4d34;padding-bottom:16px;margin-bottom:22px;}
+      .logo{height:56px;}
+      .clinic-name{font-size:13px;color:#555;margin-top:4px;}
+      .rep-title{font-size:22px;font-weight:800;color:#0a4d34;}
+      .rep-date{font-size:12px;color:#777;margin-top:3px;}
+      .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px;}
+      .info-box{background:#f0fdf4;border-radius:10px;padding:14px;}
+      .info-box.warn{background:#fff7ed;}
+      .ib-title{font-size:10px;color:#555;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;}
+      .ib-row{font-size:12px;margin-bottom:4px;}
+      table{width:100%;border-collapse:collapse;margin-bottom:22px;}
+      thead tr{background:#0a4d34;color:#fff;}
+      th,td{padding:9px 11px;text-align:right;font-size:12px;}
+      tbody tr:nth-child(even){background:#f9fafb;}
+      tbody tr{border-bottom:1px solid #e5e7eb;}
+      .total-box{display:flex;justify-content:flex-end;}
+      .total-inner{background:#f0fdf4;border:2px solid #0a4d34;border-radius:12px;padding:16px;text-align:center;min-width:220px;}
+      .tot-orig{font-size:13px;color:#888;text-decoration:line-through;}
+      .tot-disc{font-size:12px;color:#7c3aed;}
+      .tot-main{font-size:28px;font-weight:900;color:#0a4d34;}
+      .tot-lbl{font-size:11px;color:#555;}
+      .footer{margin-top:30px;border-top:1px solid #e5e7eb;padding-top:12px;display:flex;justify-content:space-between;font-size:11px;color:#aaa;}
+      .ins-badge{display:inline-block;padding:3px 9px;background:#ede9fe;color:#6d28d9;border-radius:9px;font-size:11px;font-weight:700;margin-top:4px;}
+      @media print{body{padding:18px;}}
+    </style>
+  </head><body>
+    <div class="hdr">
+      <div><img class="logo" src="MADA_LOGO.png" onerror="this.style.display='none'"><div class="clinic-name">مركز مَدَى للعلاج الطبيعي والتأهيل الحركي</div></div>
+      <div style="text-align:left"><div class="rep-title">تقرير المريض</div><div class="rep-date">${new Date().toLocaleDateString('ar-EG',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div></div>
+    </div>
+    <div class="grid2">
+      <div class="info-box">
+        <div class="ib-title">بيانات المريض</div>
+        <div class="ib-row"><b>${p.name}</b> &nbsp;—&nbsp; ${p.id}</div>
+        <div class="ib-row">${p.phone||''}</div>
+        <div class="ib-row">${p.age?p.age+' سنة':''} ${p.gender?'| '+p.gender:''}</div>
+        <div class="ib-row">📍 ${p.area||'—'}</div>
+        ${p.insurance==='نعم'?'<div class="ins-badge">🛡️ تابع للتأمين الصحي</div>':''}
+      </div>
+      <div class="info-box warn">
+        <div class="ib-title">المعلومات الطبية</div>
+        <div class="ib-row"><b>الشكوى:</b> ${p.complaint||'—'}</div>
+        <div class="ib-row"><b>التشخيص:</b> ${p.diag||'—'}</div>
+        <div class="ib-row"><b>مدة الشكوى:</b> ${p.dur||'—'}</div>
+        <div class="ib-row"><b>السوابق:</b> ${p.chronic?.join('، ')||'لا يوجد'}</div>
+        <div class="ib-row"><b>الأدوية:</b> ${p.meds||'لا يوجد'}</div>
+        <div class="ib-row"><b>عمليات سابقة:</b> ${p.surgery||'لا'}</div>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>#</th><th>الخدمة</th><th>الدكتور</th><th>التاريخ</th><th>السعر الأصلي</th><th>الخصم</th><th>المدفوع</th><th>وسيلة الدفع</th></tr></thead>
+      <tbody>${ss.map((s,i)=>`<tr><td>${i+1}</td><td>${s.svc||'—'}</td><td>${s.doc||'—'}</td><td>${s.dt||'—'}</td><td>${(s.op||0).toLocaleString()} ج</td><td style="color:#7c3aed">${s.da>0?s.da+' ج ('+s.dp+'%)':'—'}</td><td style="font-weight:700;color:#065f46">${(s.fp||0).toLocaleString()} ج</td><td>${s.pm==='cash'?'💵 كاش':s.pm==='instapay'?'📱 انستاباي':s.pm==='wallet'?'🏦 محفظة':'⏳ لم يُدفع'}</td></tr>`).join('')}</tbody>
+    </table>
+    <div class="total-box">
+      <div class="total-inner">
+        ${origTotal!==total?`<div class="tot-orig">${origTotal.toLocaleString()} ج</div><div class="tot-disc">وفّرت: ${(origTotal-total).toLocaleString()} ج</div>`:''}
+        <div class="tot-main">${total.toLocaleString()} ج</div>
+        <div class="tot-lbl">إجمالي المدفوع</div>
+      </div>
+    </div>
+    <div class="footer">
+      <span>مركز مَدَى للعلاج الطبيعي والتأهيل الحركي</span>
+      <span>طُبع بتاريخ: ${new Date().toLocaleDateString('ar-EG')}</span>
+    </div>
+    <script>window.onload=()=>setTimeout(()=>window.print(),600);<\/script>
+  </body></html>`);
+  w.document.close();
+}
+
+/* ══ UNIFIED swTab override ══ */
+const _origSwTabBase=swTab;
+/* swTab merged above */
+
+/* PDF button injected directly into rndPI */
+
+/* ══ DISCOUNT MANUAL LABEL FIX ══ */
+// Discounts are manual-only per-session, not auto-applied
+
+
+/* ══ APPOINTMENTS — Read-only monitor with color coding ══ */
+function swToPatients(){
+  const btn=document.querySelector('.tabbtn[data-tab="tp"]');
+  if(btn)btn.click();
+}
+
+function ldAps(){
+  const day=aptFilterDay||activeDay();
+  let ap=gAp(day);
+  const q=(g('aptSearch')?.value||'').toLowerCase().trim();
+  if(q){ap=ap.filter(a=>(a.name||'').toLowerCase().includes(q)||(a.phone||'').includes(q)||(a.pid||'').toLowerCase().includes(q));}
+  const tb=g('aT');if(!tb)return;
+  if(!ap.length){tb.innerHTML=`<tr><td colspan="9"><div class="empty"><div class="ei">📅</div><p>لا توجد حجوزات${q?' تطابق البحث':''}</p></div></td></tr>`;return;}
+  const pmIcon={cash:'💵',instapay:'📱',wallet:'🏦'};
+  const SC={waiting:{bg:'rgba(245,158,11,.12)',bdr:'#f59e0b',dot:'#f59e0b',lbl:'⏳ انتظار'},'with-doctor':{bg:'rgba(6,182,212,.12)',bdr:'#06b6d4',dot:'#06b6d4',lbl:'👨‍⚕️ مع الدكتور'},done:{bg:'rgba(0,200,83,.08)',bdr:'#00c853',dot:'#00c853',lbl:'✅ تم'}};
+  tb.innerHTML=ap.map(a=>{
+    const sc=SC[a.st]||SC.waiting;
+    return `<tr style="background:${sc.bg};border-right:3px solid ${sc.bdr}" data-tip="أضيف بواسطة: ${a.by||'—'} | ${a.at?new Date(a.at).toLocaleString('ar-EG'):'—'}">
+      <td><span style="width:10px;height:10px;border-radius:50%;background:${sc.dot};display:inline-block"></span></td>
+      <td><b>${a.name}</b><br><small style="color:var(--muted)">${a.phone||''}${a.pid?' ('+a.pid+')':''}</small></td>
+      <td>${a.svc||a.service||''}</td><td>${a.doc||a.doctor||''}</td>
+      <td><b>${(a.price||0).toLocaleString()}</b> ج${a.dp>0?` <span style="font-size:10px;color:#8b5cf6">-${a.dp}%</span>`:''}</td>
+      <td>${a.pm?pmIcon[a.pm]||'—':'—'}</td>
+      <td><span style="font-size:11px;font-weight:700;color:${sc.dot}">${sc.lbl}</span></td>
+      <td style="font-size:11px;color:var(--muted)">${a.at?new Date(a.at).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}):'—'}</td>
+      <td style="display:flex;gap:3px;align-items:center">
+        ${a.st==='waiting'?`<button class="bsm" style="background:rgba(6,182,212,.1);color:#06b6d4;border:1px solid #06b6d4;font-size:10px" onclick="mvToDoc(${a.id})">👨‍⚕️</button>`:''}
+        ${a.st!=='done'?`<button class="bsm bbl" style="font-size:10px" onclick="opAppPay(${a.id})">💳</button>`:''}
+        ${CU?.role==='مدير'?`<button class="bsm bdng" onclick="delApp(${a.id})" style="font-size:10px">🗑</button>`:''}
+      </td></tr>`;
+  }).join('');
+  const titEl=g('aptDayTitle');
+  if(titEl)titEl.textContent=`📋 ${day===tds()?'اليوم':new Date(day+'T00:00:00').toLocaleDateString('ar-EG',{weekday:'short',day:'numeric',month:'short'})} — ${ap.length} حالة`;
+}
+
+/* ══ STAFF — with job type ══ */
+function addSt(){
+  const n=g('stN').value.trim(),sp=g('stSp').value.trim(),job=g('stJob')?.value||'دكتور';
+  if(!n){sT('⚠️ أدخل الاسم','w');return;}
+  const st=gSt();
+  st.push({id:Date.now(),name:n,spec:sp,job,by:CU?.name,at:new Date().toLocaleString('ar-EG')});
+  sSt(st);g('stN').value='';g('stSp').value='';ldSt();ldSSels();sT(`✅ تم إضافة ${n} (${job})`);
+}
+function ldSt(){
+  const st=gSt(),tb=g('stT');if(!tb)return;
+  if(!st.length){tb.innerHTML='<tr><td colspan="4"><div class="empty"><div class="ei">🩺</div><p>لا يوجد طاقم</p></div></td></tr>';return;}
+  const ji={دكتور:'🩺',سكرتارية:'💼',محاسب:'📊','أوفيس بوي':'🧹'};
+  tb.innerHTML=st.map(s=>`<tr data-tip="أضيف: ${s.by||'النظام'} | ${s.at||''}">
+    <td><b>${s.name}</b></td>
+    <td>${ji[s.job]||'👤'} ${s.job||'—'}</td>
+    <td style="color:var(--muted);font-size:12px">${s.spec||''}</td>
+    <td>${CU?.role==='مدير'?`<button class="bsm bdng" onclick="delSt(${s.id})">🗑</button>`:''}</td>
+  </tr>`).join('');
+}
+
+/* ══ JOURNAL ENTRIES ══ */
+const gJrn=()=>gL('ma_jrn');
+const sJrn=j=>sL('ma_jrn',j);
+const acctLbl={cash:'💵 كاش',instapay:'📱 انستاباي',wallet:'🏦 محفظة',expenses_medical:'💊 مستلزمات طبية',expenses_equipment:'🔧 أجهزة',expenses_rent:'🏢 إيجار',expenses_salary:'👤 مرتبات',other:'📦 أخرى'};
+
+function addJrnEntry(){
+  const from=g('jrnFrom').value,to=g('jrnTo').value;
+  const amt=parseFloat(g('jrnAmt').value);
+  const desc=g('jrnDesc').value.trim();
+  const date=g('jrnDate')?.value||tds();
+  if(!amt||amt<=0||!desc){sT('⚠️ أكمل بيانات القيد','w');return;}
+  if(from===to){sT('⚠️ الحساب المدين والدائن متماثلان!','w');return;}
+  const jrn=gJrn();
+  jrn.unshift({id:Date.now(),from,to,amt,desc,date,by:CU?.name,at:new Date().toISOString()});
+  sJrn(jrn);
+  g('jrnAmt').value='';g('jrnDesc').value='';
+  ldJrn();calcDb();sT(`✅ قيد: ${acctLbl[from]||from} ← ${acctLbl[to]||to} — ${amt.toLocaleString()} ج`);
+}
+
+function ldJrn(){
+  const jrn=gJrn(),tb=g('jrnTable');if(!tb)return;
+  if(!jrn.length){tb.innerHTML='<tr><td colspan="7"><div class="empty"><div class="ei">📒</div><p>لا توجد قيود</p></div></td></tr>';return;}
+  const tot=jrn.reduce((s,j)=>s+(j.amt||0),0);
+  const tt=g('jrnTotal');if(tt)tt.textContent=`إجمالي: ${tot.toLocaleString()} ج`;
+  tb.innerHTML=jrn.map(j=>`<tr data-tip="وقت: ${j.at?new Date(j.at).toLocaleString('ar-EG'):'—'}">
+    <td style="font-size:11px;color:var(--muted)">${j.date}</td>
+    <td style="color:var(--bad)">${acctLbl[j.from]||j.from}</td>
+    <td style="color:var(--ok)">${acctLbl[j.to]||j.to}</td>
+    <td><b>${(j.amt||0).toLocaleString()}</b> ج</td>
+    <td style="font-size:12px;color:var(--muted)">${j.desc}</td>
+    <td style="font-size:11px;color:var(--muted)">${j.by||'—'}</td>
+    <td>${CU?.role==='مدير'?`<button class="bsm bdng" onclick="delJrn(${j.id})">🗑</button>`:''}</td>
+  </tr>`).join('');
+}
+
+function delJrn(id){
+  askConf('حذف قيد','هل تريد حذف هذا القيد؟',()=>{sJrn(gJrn().filter(j=>j.id!==id));ldJrn();calcDb();sT('🗑️ تم الحذف');},'🗑️');
+}
+
+/* ══ ANATOMY LABELS ══ */
+const ANAT={head:'Cranium / Skull',neck:'Cervical Spine (C1-C7)',shoulder:'Glenohumeral / Rotator Cuff',chest:'Thoracic Spine (T1-T12)',arm:'Humerus / Biceps',elbow:'Olecranon / Epicondyle',forearm:'Radius & Ulna',wrist:'Carpal Tunnel / Wrist',pelvis:'Lumbar Spine (L1-L5) / Sacrum',hip:'Hip Joint / Trochanter',thigh:'Femur / Quadriceps',knee:'Patella / Meniscus / ACL',leg:'Tibia & Fibula / Calf',ankle:'Achilles Tendon / Mortise',foot:'Plantar Fascia / Metatarsals'};
+
+// SVG click → toggle pain + show term
+document.addEventListener('click',e=>{
+  const sr=e.target.closest('.sr');if(!sr)return;
+  const r=sr.getAttribute('data-r');if(!r)return;
+  sr.classList.toggle('pain');
+  const lbl=g('painTermsLabel');if(!lbl)return;
+  const term=ANAT[r]||r;
+  if(sr.classList.contains('pain')){
+    if(!lbl.innerHTML.includes(term))
+      lbl.innerHTML+=`<span class="epill" style="background:rgba(255,23,68,.1);color:#ff6b6b;border-color:#ff5252;margin:2px" data-r="${r}">${term}</span>`;
+  } else {
+    lbl.innerHTML=lbl.innerHTML.split(`data-r="${r}"`).map((s,i)=>i===0?s:s.replace(/^[^<]*>/,'')).join('');
+  }
+});
+
+// Init journal date
+(function(){const jd=g('jrnDate');if(jd&&!jd.value)jd.value=tds();})();
+
 </script>
-<div style="position:fixed;bottom:6px;right:8px;background:rgba(0,200,83,.15);color:#00c853;border:1px solid #00c853;border-radius:6px;padding:2px 8px;font-size:10px;z-index:9999;font-family:monospace">v3.0 ✅</div>
+<div style="position:fixed;bottom:6px;right:8px;background:rgba(0,200,83,.15);color:#00c853;border:1px solid #00c853;border-radius:6px;padding:2px 8px;font-size:10px;z-index:9999;font-family:monospace">v5.0 ✅</div>
 </body>
 </html>
